@@ -1,18 +1,18 @@
---------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Copyright (C) 2014-2015 Stichting Mapcode Foundation (http://www.mapcode.com)
---
+-- 
 -- Licensed under the Apache License, Version 2.0 (the "License");
 -- you may not use this file except in compliance with the License.
 -- You may obtain a copy of the License at
---
--- http://www.apache.org/licenses/LICENSE-2.0
---
+-- 
+--    http://www.apache.org/licenses/LICENSE-2.0
+-- 
 -- Unless required by applicable law or agreed to in writing, software
 -- distributed under the License is distributed on an "AS IS" BASIS,
 -- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
---------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 
 -- Mapcode management
 with As_U;
@@ -20,7 +20,7 @@ package Mapcodes is
 
   Mapcode_C_Version : constant String := "2.0.2";
   Mapcode_Data_Version : constant String := "2.3.0";
-  Mapcode_Ada_Version  : constant String := "1.0.1/Data"
+  Mapcode_Ada_Version  : constant String := "1.0.2/Data"
                                           & Mapcode_Data_Version;
 
   -- Real type
@@ -29,7 +29,7 @@ package Mapcodes is
   -----------------
   -- TERRITORIES --
   -----------------
-  -- Get_Territory_Number may raise
+  -- Get_Territory_Number may raise if Territory or Context is not known
   Unknown_Territory : exception;
 
   -- Valid territory number

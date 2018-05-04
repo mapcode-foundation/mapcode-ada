@@ -3,3 +3,7 @@
 
 # Ada Library Information
 *.ali
+
+# Test program executable
+t_mapcode
+

@@ -1,87 +1,21 @@
---------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Copyright (C) 2014-2015 Stichting Mapcode Foundation (http://www.mapcode.com)
---
+-- 
 -- Licensed under the Apache License, Version 2.0 (the "License");
 -- you may not use this file except in compliance with the License.
 -- You may obtain a copy of the License at
---
--- http://www.apache.org/licenses/LICENSE-2.0
---
+-- 
+--    http://www.apache.org/licenses/LICENSE-2.0
+-- 
 -- Unless required by applicable law or agreed to in writing, software
 -- distributed under the License is distributed on an "AS IS" BASIS,
 -- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
---------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 
 -- Various utilities on strings
 package body Str_Tools is
-
-  -- Return a String (1 .. N)
-  function Normalize (Str : String) return String is
-  begin
-    if Str'First = 1 then
-      -- Optim: no copy if not needed
-      return Str;
-    end if;
-    declare
-      Lstr : constant String (1 .. Str'Length) := Str;
-    begin
-      return Lstr;
-    end;
-  end Normalize;
-
-  function Is_Separator (Char : Character) return Boolean is
-    (Char = ' ');
-
-  function Strip (Str : String; From : Strip_Kind := Tail) return String is
-    -- Parses spaces and tabs (Ht) from the head/tail of a string
-    -- Returns the position of the first/last character or 0 if
-    --  all the string is spaces or tabs (or empty)
-    function Parse_Spaces (Str : String;
-                           From_Head : Boolean := True)
-             return Natural is
-    begin
-      if From_Head then
-        -- Look forward for significant character
-        for I in Str'Range loop
-          if not Is_Separator (Str(I)) then
-            return I;
-          end if;
-        end loop;
-        -- Not found
-        return 0;
-      else
-        -- Look backwards for significant character
-        for I in reverse Str'Range loop
-          if not Is_Separator (Str(I)) then
-            return I;
-          end if;
-        end loop;
-        -- Not found
-        return 0;
-      end if;
-    end Parse_Spaces;
-
-    Start, Stop : Natural;
-  begin
-    case From is
-      when Tail =>
-        Start := Str'First;
-        Stop  := Parse_Spaces (Str, False);
-      when Head =>
-        Start := Parse_Spaces (Str, True);
-        Stop  := Str'Last;
-      when Both =>
-        Start := Parse_Spaces (Str, True);
-        Stop  := Parse_Spaces (Str, False);
-    end case;
-    if Start = 0 then
-      return "";
-    else
-      return Normalize (Str(Start .. Stop));
-    end if;
-  end Strip;
 
   -- Locate the Nth occurence of a fragment within a string,
   --  between a given index (first/last if 0) and the end/beginning of the

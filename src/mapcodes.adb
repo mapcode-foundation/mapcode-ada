@@ -1,18 +1,18 @@
---------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Copyright (C) 2014-2015 Stichting Mapcode Foundation (http://www.mapcode.com)
---
+-- 
 -- Licensed under the Apache License, Version 2.0 (the "License");
 -- you may not use this file except in compliance with the License.
 -- You may obtain a copy of the License at
---
--- http://www.apache.org/licenses/LICENSE-2.0
---
+-- 
+--    http://www.apache.org/licenses/LICENSE-2.0
+-- 
 -- Unless required by applicable law or agreed to in writing, software
 -- distributed under the License is distributed on an "AS IS" BASIS,
 -- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
---------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 
 with Str_Tools, Bits;
 with Ndata, Ctrynams;
@@ -20,9 +20,6 @@ package body Mapcodes is
 
   subtype Lint is Long_Long_Integer;
   use type Lint;
-
-  function Trim (Str : String) return String is
-      (Str_Tools.Strip (Str, Str_Tools.Both));
 
   -- All functions returning a Integer return a natural or Error
   Error : constant Integer := -1;
@@ -661,8 +658,8 @@ package body Mapcodes is
     Index : Natural;
   begin
     Index := (if Territory_Alpha_Code'Length = 2 then
-               Match (Territory_Alpha_Code, Aliases)
-              else Str_Tools.Locate (Aliases, Territory_Alpha_Code));
+               Match (Territory_Alpha_Code & "=", Aliases)
+              else Str_Tools.Locate (Aliases, Territory_Alpha_Code & "="));
     if Index /= 0 then
       return Aliases (Index + 4 .. Index + 6);
     else
@@ -704,17 +701,18 @@ package body Mapcodes is
     if Territory_Alpha_Code = Undefined then
       return Error;
     end if;
-    Alpha_Code := Tus (Str_Tools.Upper_Str (Trim (Territory_Alpha_Code)));
+    P := Parent_Letter (Context);
+    if Context /= "" and then P = Error then
+      return Error;
+    end if;
+
+    Alpha_Code := Tus (Str_Tools.Upper_Str (Territory_Alpha_Code));
     -- Direct code
     if Is_Digits (Alpha_Code.Image) then
       N := Natural'Value (Alpha_Code.Image);
       if N <= Ccode_Earth then
         return N;
       end if;
-    end if;
-    P := Parent_Letter (Context);
-    if P = Error then
-      P := 1;
     end if;
 
     -- Name
@@ -738,7 +736,7 @@ package body Mapcodes is
         if Proper_Map_Code.Length = 3 then
           Isoa := Tus (Alias2Iso(Proper_Map_Code.Image));
         else
-          Isoa := Tus (Image (P) & Proper_Map_Code.Image);
+          Isoa := Tus (Alias2Iso (Image (P) & Proper_Map_Code.Image));
         end if;
         if not Isoa.Is_Null then
           if Isoa.Slice (1, 1) = Image (P) then
@@ -755,19 +753,23 @@ package body Mapcodes is
       end;
     end if;
 
-    -- First rewrite alias in context
-    if Alpha_Code.Length = 2 then
-      Isoa := Tus (Alias2Iso (Image (P) & Alpha_Code.Image));
-      if not Isoa.Is_Null then
-        if Isoa.Slice (1, 1) = Image (P) then
-          Alpha_Code := Isoa.Uslice(2, Isoa.Length);
-        else
-          Alpha_Code := Isoa;
+    -- No prefix.
+
+    if P /= Error then
+      -- First rewrite alias in context
+      if Alpha_Code.Length = 2 then
+        Isoa := Tus (Alias2Iso (Image (P) & Alpha_Code.Image));
+        if not Isoa.Is_Null then
+          if Isoa.Slice (1, 1) = Image (P) then
+            Alpha_Code := Isoa.Uslice(2, Isoa.Length);
+          else
+            Alpha_Code := Isoa;
+          end if;
         end if;
       end if;
     end if;
 
-    -- No prefix. check if a normal territory
+    -- Check if a normal territory
     if Alpha_Code.Length = 3 then
       Index := Find_Iso (Alpha_Code.Image);
       if Index >= 0 then
@@ -775,11 +777,14 @@ package body Mapcodes is
       end if;
     end if;
 
-    -- No prefix, check in context
-    Index := Find_Iso (Parent_Name2 (P) & "-" & Alpha_Code.Image);
-    if Index >= 0 then
-      return Index;
+    -- Check in context
+    if P /= Error then
+      Index := Find_Iso (Parent_Name2 (P) & "-" & Alpha_Code.Image);
+      if Index >= 0 then
+        return Index;
+      end if;
     end if;
+
     if Alpha_Code.Length >= 2 then
       -- Find in ANY context
       Hyphenated := Tus ("-") & Alpha_Code;
@@ -814,29 +819,21 @@ package body Mapcodes is
   -- A context_Territory number helps to interpret ambiguous (abbreviated)
   --  AlphaCodes, such as "AL"
   function Get_Territory_Number (Territory : String;
-                                 Context : in Integer) return Territory_Range is
+                                 Context : in String := "")
+           return Territory_Range is
     Num : Integer;
   begin
-    Num := Iso2Ccode (Territory,
-                      (if Context = Error then ""
-                       else Iso3166Alpha(Context).Image));
+    Num := Iso2Ccode (Territory, Context);
     if Num = Error then
       raise Unknown_Territory;
     end if;
     return Num;
   end Get_Territory_Number;
   function Get_Territory_Number (Territory : String;
-                                 Context : in String := "")
-           return Territory_Range is
-    Num : Integer;
-  begin
-    if Context = Undefined then
-     Num := Error;
-    else
-      Num := Get_Territory_Number (Context, Undefined);
-    end if;
-    return Get_Territory_Number (Territory, Num);
-  end Get_Territory_Number;
+                                 Context : in Integer) return Territory_Range is
+      (Get_Territory_Number (
+         Territory,
+         (if Context = Error then "" else Iso3166Alpha(Context).Image)));
 
   -- Return full name of territory or Undefined
   function Get_Territory_Fullname (Territory_Number: in Territory_Range)
@@ -1547,15 +1544,15 @@ package body Mapcodes is
       if Short then
         -- v1.50 new way: use only A
         V := (Character'Pos(Result.Element (1)) - 48) * 100
-           + (Character'Pos(Result.Element (Rlen - 2)) - 48) * 10
-           +  Character'Pos(Result.Element (Rlen - 1)) - 48;
-        Result := 'A' & Result.Uslice (2, Rlen - 3)
+           + (Character'Pos(Result.Element (Rlen - 1)) - 48) * 10
+           +  Character'Pos(Result.Element (Rlen))     - 48;
+        Result := 'A' & Result.Uslice (2, Rlen - 2)
                 & Encode_Char(V / 32 + 1) &  Encode_Char(V rem 32 + 1);
       else
         -- Old way: use A, E and U */
-        V := (Character'Pos(Result.Element(Rlen - 2)) - 48) * 10
-           +  Character'Pos(Result.Element(Rlen - 1)) - 48;
-        Result := Result.Uslice(1, Rlen - 3)
+        V := (Character'Pos(Result.Element(Rlen - 1)) - 48) * 10
+           +  Character'Pos(Result.Element(Rlen))     - 48;
+        Result := Result.Uslice(1, Rlen - 2)
                 & Encode_Char(V / 34 + 32)
                 & Encode_Char(V rem 34 + 1);
 
@@ -1630,7 +1627,7 @@ package body Mapcodes is
           return Undefined;
         end if;
         Voweled := True;
-        Result := Result.Uslice (1, Lastpos - 1)
+        Result := Result.Uslice (1, Lastpos - 2)
                 & Encode_Char(V / 10 + 1) & Encode_Char(V rem 10 + 1);
       end if;
     end if;
@@ -1651,6 +1648,9 @@ package body Mapcodes is
       end if;
     end loop;
     if Voweled and then Has_Letters then
+      return Undefined;
+    end if;
+    if not Voweled and then not Has_Letters then
       return Undefined;
     end if;
     return Result.Image;
@@ -1789,7 +1789,7 @@ package body Mapcodes is
       if X < 62 - A then
         Swap_Letters := Codex = 22;
       else
-        X := X + X - 62 - A;
+        X := X + X - (62 - A);
       end if;
     else
       -- codex = 21 or else A >= 62
@@ -1811,7 +1811,8 @@ package body Mapcodes is
     if Swap_Letters then
       if not Is_Special_Shape (M + X) then
         Result := As_U.Tus (Result.Element (1) & Result.Element (2)
-                          & Result.Element (4) & Result.Element (5));
+                          & Result.Element (4) & Result.Element (3)
+                          & Result.Element (5));
       end if;
     end if;
 
@@ -1960,7 +1961,7 @@ package body Mapcodes is
   begin
     Value := Value * (961 * 31);
     -- Decode bottom
-    Triple := Decode_Triple (Input (Input'Last - 3 .. Input'Last));
+    Triple := Decode_Triple (Input (Input'Last - 2 .. Input'Last));
 
     Lm := M;
     while Co_Dex (Lm) = Codex and then Rec_Type (Lm) > 1 loop
@@ -1968,8 +1969,8 @@ package body Mapcodes is
       H := (Mm.Maxy - Mm.Miny + 89) / 90;
       Xdiv := Lint (Xdivider4 (Mm.Miny, Mm.Maxy));
       W := ((Mm.Maxx - Mm.Minx) * 4 + (Xdiv - 1)) / Xdiv;
-      H := 176 * (H + 176 - 1) / 176;
-      W := 168 * (W + 168 - 1) / 168;
+      H := 176 * ((H + 176 - 1) / 176);
+      W := 168 * ((W + 168 - 1) / 168);
       Product := (W / 168) * (H / 176) * 961 * 31;
 
       if Rec_Type (Lm) = 2 then
@@ -2300,7 +2301,7 @@ package body Mapcodes is
 
   function Master_Decode (Mapcode : String; Territory_Number : Natural)
            return Coordinate is
-    Map_Code : As_U.Asu_Us := As_U.Tus (Trim(Mapcode));
+    Map_Code : As_U.Asu_Us := As_U.Tus (Mapcode);
     Extensionchars : As_U.Asu_Us;
     Minpos : constant Natural := Map_Code.Locate ("-");
     Mclen : Positive;
@@ -2399,6 +2400,9 @@ package body Mapcodes is
               Zone := Zfound;
             end if;
           end if;
+          if Nr_Zone_Overlaps = 0 then
+              Zone := Mz_Empty;
+          end if;
         end if;
         exit;
       elsif Rec_Type(M) = 1 and then Codex + 10 = Incodex
@@ -2416,6 +2420,7 @@ package body Mapcodes is
       elsif Rec_Type(M) > 1 and then Postfixlength = 3
       and then Codex_Len(M) = Prefixlength + 2 then
         Zone := Decode_Auto_Header (Map_Code.Image, Extensionchars.Image, M);
+        exit;
       end if;
     end loop;
 
@@ -2445,7 +2450,6 @@ package body Mapcodes is
   end Encode;
 
   function Decode (Mapcode, Context : String) return Coordinate is
-    Map_Code : constant String := Trim (Mapcode);
     Contextterritorynumber : Integer;
     Space1, Space2 : Natural;
     Part1, Part2 : As_U.Asu_Us;
@@ -2456,6 +2460,7 @@ package body Mapcodes is
     begin
       return Res;
     end Spaces;
+    F : constant Positive := Mapcode'First;
   begin
     if Context = Undefined then
       Contextterritorynumber := Ccode_Earth;
@@ -2463,14 +2468,14 @@ package body Mapcodes is
       Contextterritorynumber := Get_Territory_Number(Context);
     end if;
 
-    Space1 := Str_Tools.Locate (Map_Code, " ");
-    Space2 := Str_Tools.Locate (Map_Code, " ", Forward => False);
+    Space1 := Str_Tools.Locate (Mapcode, " ");
+    Space2 := Str_Tools.Locate (Mapcode, " ", Forward => False);
     if Space1 = 0 then
-      return Master_Decode(Map_Code, Contextterritorynumber);
+      return Master_Decode(Mapcode, Contextterritorynumber);
     end if;
-    if Map_Code (Space1 .. Space2) = Spaces (Space1, Space2) then
-      Part1 := As_U.Tus (Map_Code (1 .. Space1 - 1));
-      Part2 := As_U.Tus (Map_Code (Space2 + 1 .. Map_Code'Length));
+    if Mapcode (Space1 .. Space2) = Spaces (Space1, Space2) then
+      Part1 := As_U.Tus (Mapcode (F .. Space1 - 1));
+      Part2 := As_U.Tus (Mapcode (Space2 + F .. Mapcode'Last));
       if Is_Subdivision (Contextterritorynumber) then
         Contextterritorynumber := Get_Parent (Contextterritorynumber);
       end if;

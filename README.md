@@ -30,7 +30,7 @@ multi-language support) by Pascal Malaise.
 
 # Ada Files for Mapcode Support
 
-The following files provide utilities for mapcode processing:
+The following files, in directory src, provide utilities for mapcode processing:
 
     as_u.ads as_u.adb               - Unbounded strings
     bits.ads bits.adb               - Bit operations
@@ -42,9 +42,12 @@ The following files provide the Ada interface for mapcodes:
     ndata.ads                       - Data table for mapcode support
     ctrynams.ads ctrynams_short.ads - Names of territories (in English)
 
-The following file contains the  main procedure for testing the interfaces:
+The following file contains the main procedure for testing the interfaces:
 
     t_mapcode.adb                   - Command line tool to test Ada mapcodes
+
+
+In directory test, the command Test launches a complete test of the library.
 
 # Using the Library
 
@@ -298,6 +301,12 @@ Decode a mapcode with context.
     -> => 52.376514000 4.908543375
 
 # Version History
+
+### 1.0.2
+
+* More strict check of context
+* Add automatic tests of territory, encoding and decoding, including expected
+failures. Fix defects.
 
 ### 1.0.1
 
