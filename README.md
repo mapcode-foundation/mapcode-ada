@@ -302,7 +302,7 @@ Decode a mapcode with context.
 
 # Version History
 
-### 1.0.2
+### 1.0.3
 
 * Fix and improve accuracy
 
