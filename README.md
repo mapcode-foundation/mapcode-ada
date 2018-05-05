@@ -47,7 +47,7 @@ The following file contains the main procedure for testing the interfaces:
     t_mapcode.adb                   - Command line tool to test Ada mapcodes
 
 
-In directory test, the command Test launches a complete test of the library.
+In directory test, the command fulltest launches a complete test of the library.
 
 # Using the Library
 
@@ -301,6 +301,10 @@ Decode a mapcode with context.
     -> => 52.376514000 4.908543375
 
 # Version History
+
+### 1.0.2
+
+* Fix and improve accuracy
 
 ### 1.0.2
 
