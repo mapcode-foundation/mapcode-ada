@@ -8,8 +8,6 @@
 
 ----
 
-**Online documentation can be found at: http://mapcode-foundation.github.io/mapcode-ada/**
-
 # License
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,9 +26,12 @@ Original C library created by Pieter Geelen. Work on Java version
 of the Mapcode library by Rijn Buve and Matthew Lowden. Port into Ada (except
 multi-language support) by Pascal Malaise.
 
+The original Ada port can be found at: 
+https://github.com/malaise/ada/tree/master/usr/mapcode
+
 # Ada Files for Mapcode Support
 
-The following files, in directory src, provide utilities for mapcode processing:
+The following files, in directory `src`, provide utilities for mapcode processing:
 
     as_u.ads as_u.adb               - Unbounded strings
     bits.ads bits.adb               - Bit operations
@@ -47,7 +48,7 @@ The following file contains the main procedure for testing the interfaces:
     t_mapcode.adb                   - Command line tool to test Ada mapcodes
 
 
-In directory test, the command fulltest launches a complete test of the library.
+In directory `test`, the command `fulltest` launches a complete test of the library.
 
 # Using the Library
 
@@ -55,20 +56,20 @@ In directory test, the command fulltest launches a complete test of the library.
 
 A territory is identified by a code (an ISO 3166 code such as “NLD” or "US-DC"), with some
 possible aliases (example "US" = "USA"), and a unique number, from 0 for "VAT" (Vatican),
-to 532 for "AAA" (International), defined as Territory_Range.
+to 532 for "AAA" (International), defined as `Territory_Range`.
 
 Large territories (MX, IN, AU, BR, US, CA, RU and CN) are decomposed into subdivisions.
 
-**Get_Territory_Number** returns the territory number of a territory code. An optional context helps to interpret
+*`Get_Territory_Number` returns the territory number of a territory code. An optional context helps to interpret
 ambiguous (abbreviated) alphacodes of subdivisions, such as "AL". If several subdivisions match the specification
 (no context provided) it returns the lowest number that matches.
 
-attribute | description
+Attribute | Description
 --- | ---
-Territory | string, mapcode to decode
-Context | optional string, (an ISO code such as “US”) territory for a subdivision
-return value | Territory_Range, territory number
-exceptions | Unknown_Territory if the territory code is not known
+`Territory` | string, mapcode to decode
+`Context` | optional string, (an ISO code such as “US”) territory for a subdivision
+return value | `Territory_Range`, territory number
+exceptions | `Unknown_Territory` if the territory code is not known
 
 Examples:
 
@@ -87,12 +88,12 @@ Ambiguous code and context.
     Get_Territory_Number ("IN", "AR")
     -> 285              // IN-AR/Arunachal Pradesh
 
-**Get_Territory_Alpha_Code** returns the territory ISO 3166 code of a territory.
+`Get_Territory_Alpha_Code` returns the territory ISO 3166 code of a territory.
 
-attribute | description
+Attribute | Description
 --- | ---
-Territory_Number | Territory_Range
-Format | Local (often ambiguous), International (full and unambiguous, default), or Shortest
+`Territory_Number` | `Territory_Range`
+`Format` | `Local` (often ambiguous), `International` (full and unambiguous, default), or `Shortest`
 return value | string, territory ISO code
 
 Examples:
@@ -111,9 +112,9 @@ Examples:
 
 **Get_Territory_Fullname** returns the full common name of a territory
 
-attribute | description
+Attribute | Description
 --- | ---
-Territory_Number | Territory_Range
+`Territory_Number` | `Territory_Range`
 return value | string, territory name
 
 Examples:
@@ -121,12 +122,12 @@ Examples:
     Get_Territory_Fullname (391)
     -> California
 
-**Get_Parent_Of** returns the parent territory number of a subdivision.
+`Get_Parent_Of` returns the parent territory number of a subdivision.
 
-attribute | description
+Attribute | Description
 --- | ---
-Territory_Number | Territory_Range
-return value | Territory_Range, parent territory number
+`Territory_Number` | `Territory_Range`
+return value | `Territory_Range`, parent territory number
 exceptions | Not_A_Subdivision, if the Territory_Number has no parent (i.e. is not a subdivision)
 
 **Is_Subdivision** returns True if the provided territory is a subdivision.
@@ -150,7 +151,7 @@ This means that a coordinate will often yield mapcode possibilities in more than
 Each possibility correctly represents the coordinate, but which one is *politically* correct is a 
 choice that must be made (in advance or afterwards) by the caller or user of the routines.
 
-There is only one operation, **encode**, which generates the possible mapcodes for a coordinate.
+There is only one operation, `encode`, which generates the possible mapcodes for a coordinate.
 At least it takes as input a latitude in degrees (all values allowed, maximized by routine to 90.0 and minimized
 to -90.0) and a longitude in degrees (all values allowed, wrapped to -180.0 and +180.0).
 
@@ -172,13 +173,13 @@ sometimes called the “default mapcode” for a particular territory.
 
 Examples:
 
-With a territory specified, and Shortest set, returns the default mapcode for this territory.
+With a territory specified, and `Shortest` set, returns the default mapcode for this territory.
 
     Encode ( (52.376514000, 4.908543375 40.786245000), "NLD")
     -> 49.4V NLD 'NLD 49.4V' 112
 
 
-With a territory specified, and Shortest set to False, returns all the possible mapcodes
+With a territory specified, and `Shortest` set to `False`, returns all the possible mapcodes
 for this territory.
 
     Encode ( (52.376514000, 4.908543375 40.786245000), "NLD", False)
@@ -187,7 +188,7 @@ for this territory.
     -> DL6.H9L NLD 'NLD DL6.H9L' 112
     -> P25Z.N3Z NLD 'NLD P25Z.N3Z' 112
 
-With no limitation to a territory (and Shortest set), returns at least a worldwide mapcode
+With no limitation to a territory (and `Shortest` set), returns at least a worldwide mapcode
 (territory AAA, code 532), and possibly some mapcodes in territories.
 
     Encode ( (52.376514000, 4.908543375 40.786245000) )
@@ -202,18 +203,18 @@ With a precision of 2, returns high precision mapcodes.
 
 ## Converting a Mapcode into a Coordinate
 
-There is only one operation, **decode**, which gives the coordinate of a mapcode.
+There is only one operation, `decode`, which gives the coordinate of a mapcode.
 It accepts an optional argument to define the territoy context of the mapcode.
 
 The operation returns the coordinate (latitude and longitude in degrees), or raises the
 exception Decode_Error if the mapcode is not valid or ambiguous (in the context).
 
-attribute | description 
+Attribute | Description 
 --- | --- 
-Mapcode | string, mapcode to decode
-Context | optional string, (an ISO code such as “NLD”) territory for the scope of the mapcode
+`Mapcode` | string, mapcode to decode
+`Context` | optional string, (an ISO code such as “NLD”) territory for the scope of the mapcode
 return value | coordinate (latitude and longitude in degrees), reals
-exceptions | Decode_Error, if the mapcode is invalid or ambiguous in the Context
+exceptions | `Decode_Error`, if the mapcode is invalid or ambiguous in the Context
 
 Examples:
 
@@ -230,7 +231,7 @@ Without any context, only accept a worldwide mapcode.
 
 # Using the testing program
 
-The command line testing tool **t_mapcode** can perform 3 actions:
+The command line testing tool `t_mapcode** can perform 3 actions:
 
 * Display information on a territory number or territory ISO 3166 code
 
