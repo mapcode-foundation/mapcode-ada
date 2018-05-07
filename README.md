@@ -4,7 +4,7 @@
 [![Release](https://img.shields.io/github/release/mapcode-foundation/mapcode-ada.svg?maxAge=3600)](https://github.com/mapcode-foundation/mapcode-ada/releases)
 
 
-**Copyright (C) 2014-2017 Stichting Mapcode Foundation (http://www.mapcode.com)**
+**Copyright (C) 2003-2018 Stichting Mapcode Foundation (http://www.mapcode.com)**
 
 ----
 
@@ -301,6 +301,12 @@ Decode a mapcode with context.
     -> => 52.376514000 4.908543375
 
 # Version History
+
+### 1.0.4
+
+* A little bit more strict check when precision is above 0
+* Add MMR in test scenario
+* Update years of copyright
 
 ### 1.0.3
 

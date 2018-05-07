@@ -1,5 +1,5 @@
 -- -----------------------------------------------------------------------------
--- Copyright (C) 2014-2015 Stichting Mapcode Foundation (http://www.mapcode.com)
+-- Copyright (C) 2003-2018 Stichting Mapcode Foundation (http://www.mapcode.com)
 -- 
 -- Licensed under the Apache License, Version 2.0 (the "License");
 -- you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ package Mapcodes is
 
   Mapcode_C_Version : constant String := "2.0.2";
   Mapcode_Data_Version : constant String := "2.3.0";
-  Mapcode_Ada_Version  : constant String := "1.0.3/Data"
+  Mapcode_Ada_Version  : constant String := "1.0.4/Data"
                                           & Mapcode_Data_Version;
 
   -- Real type
