@@ -105,7 +105,7 @@ Examples:
     -> "AR"
 
     Get_Territory_Alpha_Code (365, Shortest)
-    -> "US-AR"        // Because AS is ambiguous (IN-AR)
+    -> "US-AR"        // Because AR is ambiguous (IN-AR)
 
     Get_Territory_Alpha_Code (391, Shortest)
     -> "CA"           // US-CA, not ambiguous
@@ -197,14 +197,14 @@ With no limitation to a territory (and `Shortest` set), returns at least a world
 
 With a precision of 2, returns high precision mapcodes.
 
-    Encode ( (52.376514000, 4.908543375 40.786245000), Pecision -> 2)
+    Encode ( (52.376514000, 4.908543375 40.786245000), Precision -> 2)
     -> 49.4V-K3 NLD 'NLD 49.4V-K3' 112
     -> VHXGB.1J9J-RD AAA VHXGB.1J9J-RD 532
 
 ## Converting a Mapcode into a Coordinate
 
 There is only one operation, `decode`, which gives the coordinate of a mapcode.
-It accepts an optional argument to define the territoy context of the mapcode.
+It accepts an optional argument to define the territory context of the mapcode.
 
 The operation returns the coordinate (latitude and longitude in degrees), or raises the
 exception Decode_Error if the mapcode is not valid or ambiguous (in the context).
@@ -264,7 +264,7 @@ territory number, followed by three possible mapcodes (Local, International and 
     -> USA => 410: USA/USA/USA/USA
     -> Has subdivisions
 
-Encode a coordinate with a context and a precision, put inforamtion of the shortest mapcode.
+Encode a coordinate with a context and a precision, put information of the shortest mapcode.
 Information is the mapcode, the territory context of the mapcode, the full mapcode (territory
 and mapcode separated by a space and enclosed by quotes, except for international mapcodes) and territory number.
 
@@ -303,28 +303,13 @@ Decode a mapcode with context.
 
 # Version History
 
-### 1.0.4
-
-* A little bit more strict check when precision is above 0
-* Add MMR in test scenario
-* Update years of copyright
-
-### 1.0.3
-
-* Fix and improve accuracy
-
-### 1.0.2
-
-* More strict check of context
-* Add automatic tests of territory, encoding and decoding, including expected
-failures. Fix defects.
-
-### 1.0.1
-
-* Align max nr of mapcode results to C value, and check overflow
-* Get rid of global variable (Disambiguate)
-
 ### 1.0.0
 
+* Update years of copyright
+* Fix and improve accuracy
+* Add automatic tests of territory, encoding and decoding, including expected
+failures. Fix defects.
+* Align max nr of mapcode results to C value, and check overflow
+* Get rid of global variable (Disambiguate)
 * Initial version  for public domain release.
 
