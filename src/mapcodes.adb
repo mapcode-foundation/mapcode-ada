@@ -1452,7 +1452,7 @@ package body Mapcodes is
     Idx : Positive;
     Column1, Row1, Column2, Row2 : Lint;
     C1, C2 : Character;
-    N1, N2 : Natural;
+    N1, N2 : Integer;
     Ldivx4, Ldivy : Lint;
     Lon4, Lat1: Lint;
     Mapcode_Zone : Mapcode_Zone_Rec;
@@ -1466,7 +1466,7 @@ package body Mapcodes is
       C1 := Extension_Chars(Idx);
       N1 := Decode_Char(Character'Pos(C1) + 1);
       Idx := Idx + 1;
-      if N1 = 30 then
+      if N1 < 0 or else N1 = 30 then
         return Mz_Empty;
       end if;
       Row1 := Lint (N1 / 5);
@@ -1475,7 +1475,7 @@ package body Mapcodes is
         C2 := Extension_Chars(Idx);
         N2 := Decode_Char(Character'Pos(C2) + 1);
         Idx := Idx + 1;
-        if N2 = 30 then
+        if N2 < 0 or else N2 = 30 then
           return Mz_Empty;
         end if;
         Row2 := Lint (N2 / 6);
@@ -2464,8 +2464,7 @@ package body Mapcodes is
       Extra_Digits => Precision);
   end Encode;
 
-  function Decode (Mapcode : String;
-                   Context : String := "") return Coordinate is
+  function Decode (Mapcode, Context : String) return Coordinate is
     Contextterritorynumber : Integer;
     Space1, Space2 : Natural;
     Part1, Part2 : As_U.Asu_Us;
