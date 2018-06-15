@@ -2452,16 +2452,46 @@ package body Mapcodes is
   function Encode (Coord : Coordinate;
                    Territory : String := "";
                    Shortest : Boolean := False;
-                   Precision : Precisions := 0) return Mapcode_Infos is
-  begin
-    return Mapcoder_Engine (
+                   Precision : Precisions := 0;
+                   Sort : Boolean := False) return Mapcode_Infos is
+    Result : Mapcode_Infos := Mapcoder_Engine (
       Enc => Get_Encode_Rec (Coord.Lat, Coord.Lon),
-      Tn => (if Str_Tools.Mixed_Str (Territory) = Earth then Ccode_Earth
-             elsif Territory = "" then Error
+      Tn => (if Territory = "" then Error
              else Get_Territory_Number (Territory)),
       Get_Shortest => Shortest,
       State_Override => -1,
       Extra_Digits => Precision);
+    -- First and last index of the mapcodes, of the same territory,
+    --  producing the shortest mapcode
+    First, Last : Natural := 0;
+    Len : Positive := Positive'Last;
+    use type As_U.Asu_Us;
+  begin
+    if not Sort then
+      return Result;
+    end if;
+    -- Search shosrtest mapcode (First) and the Last mapcode for the
+    -- same territoy
+    for I in Result'Range loop
+      if Result(I).Mapcode.Length < Len then
+        First := I;
+        Len := Result(I).Mapcode.Length;
+      end if;
+      if Result(I).Territory_Alpha_Code
+       = Result(First).Territory_Alpha_Code then
+        Last := I;
+      end if;
+    end loop;
+    -- Move First .. Last at beginning of list
+    if First /= Result'First then
+      declare
+         Slice : constant Mapcode_Infos := Result(First .. Last);
+      begin
+        Result(Last-First+2 .. Last) := Result(Result'First .. First-1);
+        Result(Result'First .. Result'First+Last-First) := Slice;
+      end;
+    end if;
+    return Result;
   end Encode;
 
   function Decode (Mapcode, Context : String) return Coordinate is

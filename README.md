@@ -172,22 +172,36 @@ attribute | description
 `Territory` | optional string, (an ISO code such as “NLD”) territory for the scope of the mapcodes
 `Shortest` | boolean, default True, to return only the shortest possible mapcode for the territory or each possible territory
 `Precision` | 0, 1 or 2, default 0, precision of the mapcode to generate
+`Sort` | sort the territories so that the shortest mapcode appears first
 return value | array of mapcode informations (territory ISO code, mapcode, full mapcode, and territory number)
 
 This function will return at least one result: the shortest mapcode (if any)
 that exists for that coordinate within the specified territory. Such a mapcode
-is also sometimes called the “default mapcode” for a particular territory.
+is also sometimes called the “default mapcode” for a particular territory.  
+The resulting array is always organized by territories: all the mapcodes
+of a territory follow each other and in order of increasing length.  
+If Sort is set, then the returned array contains first the shortest
+mapcode, then possibly the other mapcodes for the same territory,
+then possibly mapcodes for other territories, then possibly the
+international (Earth) mapcode, otherwise the territories appear in the crescent
+order of Territory_Range (see package Ctrynams).  
+As a consequence, if it appears, the international mapcode is always the last.
 
 Examples:
 
-With a `Territory` specified, and `Shortest` set, returns the default mapcode for this
+With a`Territory` specified, and `Shortest` set, returns the default mapcode for this
 territory.
 
     Encode ( (52.376514000, 4.908543375 40.786245000), "NLD")
     -> NLD 49.4V 'NLD 49.4V' 112
 
+With a Territory set to Earth ("AAA"), returns the international mapcode,
+(whatever Shortest)
 
-With a `Territory` specified, and `Shortest` set to False, returns all the possible mapcodes
+    Encode ( (52.376514000, 4.908543375 40.786245000), "AAA")
+    -> AAA VHXGB.1J9J 'VHXGB.1J9J' 532
+
+With a `Territory` specified, and `Shortest`set to False, returns all the possible mapcodes
 for this territory.
 
     Encode ( (52.376514000, 4.908543375 40.786245000), "NLD", Shortest => False)
@@ -204,11 +218,30 @@ territories.
     -> NLD 49.4V 'NLD 49.4V' 112
     -> AAA VHXGB.1J9J 'VHXGB.1J9J' 532
 
-With a `Precision` of 2, returns high precision mapcodes.
+With Sort set, return the territory with shortest mapcode first.
+
+    Encode ( (39.730409000, -79.954163500), "", Sortest => False, Sort => False)
+    -> US-WV W2W2.Q41V 'US-WV W2W2.Q41V' 353
+    -> US-PA BYLP.73 'US-PA BYLP.73' 361
+    -> US-PA HDWQ.NZN 'US-PA HDWQ.NZN' 361
+    -> US-PA W2W2.Q41V 'US-PA W2W2.Q41V' 361
+    -> USA W2W2.Q41V 'USA W2W2.Q41V' 410
+    -> AAA S8LY1.RD84 'S8LY1.RD84' 532
+
+    Encode ( (39.730409000, -79.954163500), "", Sortest => False, Sort => True)
+    -> US-PA BYLP.73 'US-PA BYLP.73' 361
+    -> US-PA HDWQ.NZN 'US-PA HDWQ.NZN' 361
+    -> US-PA W2W2.Q41V 'US-PA W2W2.Q41V' 361
+    -> US-WV W2W2.Q41V 'US-WV W2W2.Q41V' 353
+    -> USA W2W2.Q41V 'USA W2W2.Q41V' 410
+    -> AAA S8LY1.RD84 'S8LY1.RD84' 532
+
+With a`Precision` of 2, returns high precision mapcodes.
 
     Encode ( (52.376514000, 4.908543375 40.786245000), Precision => 2)
     -> NLD 49.4V-K3 'NLD 49.4V-K3' 112
     -> AAA VHXGB.1J9J-RD 'VHXGB.1J9J-RD' 532
+
 
 ## Converting a Mapcode into a Coordinate
 
@@ -255,11 +288,17 @@ The command line testing tool `t_mapcode` can perform 3 actions:
 Usage:
 
     t_mapcode <command>
-      -h                            // This help
-      -t <territory>                // Territory info
-      -d [ <territory> ] <mapcode>  // Decode
-      -c <lat> <lon> [ <options> ]  // Encode
-      <options> ::= [ <territory> ] [ <shortest> ] [ <precision> ]
+      -h                                // This help
+      -t <territory>                    // Territory info
+      -d [ <territory> ] <mapcode>      // Decode
+      -d  <territory>:<mapcode>         // Decode
+      -c <lat> <lon> [ <options> ]      // Encode
+      <options>   ::= [ <territory> ] [ <selection> ] [ <precision> ]
+      <selection> ::= [ all | local ]   // Default shortest
+
+Default selection leads to encode with Shortest => True, while `all` leads to
+encode with Shortest => False, and 'local' leads to encode with Shortest => True
+and Shortest => True and to display the first entry of the returnd array.
 
 Examples:
 
@@ -301,6 +340,23 @@ Put all mapcodes of a coordinate with a context.
     -> => DL6.H9L NLD 'NLD DL6.H9L' 112
     -> => P25Z.N3Z NLD 'NLD P25Z.N3Z' 112
 
+Put all mapcodes of a coordinate.
+
+    t_mapcode -c 39.730409000  -79.954163500 all 
+    -> 39.730409000  -79.954163500
+    -> => US-WV W2W2.Q41V 'US-WV W2W2.Q41V' 353
+    -> => US-PA BYLP.73 'US-PA BYLP.73' 361
+    -> => US-PA HDWQ.NZN 'US-PA HDWQ.NZN' 361
+    -> => US-PA W2W2.Q41V 'US-PA W2W2.Q41V' 361
+    -> => USA W2W2.Q41V 'USA W2W2.Q41V' 410
+    -> => AAA S8LY1.RD84 'S8LY1.RD84' 532
+
+Put the local mapcode of a coordinate.
+
+    t_mapcode -c 39.730409000  -79.954163500 local
+    -> 39.730409000  -79.954163500
+    -> => US-PA BYLP.73 'US-PA BYLP.73' 361
+
 Decode a mapcode, no context.
 
     t_mapcode -d 49.4V
@@ -318,6 +374,11 @@ Decode a mapcode with context.
     -> => 52.376514000 4.908543375
 
 # Version History
+
+### 1.0.6
+
+* Add an option to sort the returned list of mapcodes
+* Add to t_mapcode a "local/all" option and support for "\<territory\>:\<mapcode\>"
 
 ### 1.0.4
 

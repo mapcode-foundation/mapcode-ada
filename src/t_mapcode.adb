@@ -25,15 +25,19 @@ procedure T_Mapcode is
     Ada.Text_Io.Put_Line (
       "Usage: " & Ada.Command_Line.Command_Name & " <command>");
     Ada.Text_Io.Put_Line (
-      "  -h                            // This help");
+      "  -h                              // This help");
     Ada.Text_Io.Put_Line (
-      "  -t <territory>                // Territory info");
+      "  -t <territory>                  // Territory info");
     Ada.Text_Io.Put_Line (
-      "  -d [ <territory> ] <mapcode>  // Decode");
+      "  -d [ <territory> ] <mapcode>    // Decode");
     Ada.Text_Io.Put_Line (
-      "  -c <lat> <lon> [ <options> ]  // Encode");
+      "  -d  <territory>:<mapcode>       // Decode");
     Ada.Text_Io.Put_Line (
-      "  <options> ::= [ <territory> ] [ <shortest> ] [ <precision> ]");
+      "  -c <lat> <lon> [ <options> ]    // Encode");
+    Ada.Text_Io.Put_Line (
+      "  <options>   ::= [ <territory> ] [ <selection> ] [ <precision> ]");
+    Ada.Text_Io.Put_Line (
+      "  <selection> ::= [ all | local ] // Default short");
   end Usage;
 
   function Integer_Image (I : Integer) return String is
@@ -100,6 +104,7 @@ procedure T_Mapcode is
   Coord : Mapcodes.Coordinate;
   Territory : As_U.Asu_Us;
   Shortest : Boolean;
+  Local : Boolean;
   Precision : Precisions;
 begin
   if Ada.Command_Line.Argument_Count = 0 then
@@ -132,14 +137,18 @@ begin
       Coord.Lon := Get (Arg2.Image);
       Territory := As_U.Asu_Null;
       Shortest := True;
+      Local := False;
       Precision := 0;
       for J in I + 1 .. Ada.Command_Line.Argument_Count loop
         Arg1 := As_U.Tus (Ada.Command_Line.Argument (J));
         exit when Is_Command (Arg1.Image);
         I := J;
-        if Lower_Str (Arg1.Image) = "true"
-        or else Lower_Str (Arg1.Image) = "false" then
-          Shortest := Boolean'Value (Arg1.Image);
+        if Lower_Str (Arg1.Image) = "all" then
+          Shortest := False;
+          Local := False;
+        elsif Lower_Str (Arg1.Image) = "local" then
+          Shortest := True;
+          Local := True;
         elsif Arg1.Length = 1
         and then Arg1.Element (1) >= '0'
         and then Arg1.Element (1) <= '2' then
@@ -151,16 +160,28 @@ begin
       Ada.Text_Io.Put_Line (Image (Coord.Lat)
                                 & " " & Image (Coord.Lon));
       declare
-        Codes : constant Mapcodes.Mapcode_Infos
-              := Encode (Coord, Territory.Image, Shortest, Precision);
-      begin
-        for J in Codes'Range loop
+        procedure Put_Code (Code : Mapcodes.Mapcode_Info) is
+        begin
           Ada.Text_Io.Put_Line ("=> "
-            & Codes(J).Territory_Alpha_Code.Image
-            & " " &  Codes(J).Mapcode.Image
-            & " " & Quote (Codes(J).Full_Mapcode.Image)
-            & " " & Integer_Image (Codes(J).Territory_Number));
-        end loop;
+            & Code.Territory_Alpha_Code.Image
+            & " " &  Code.Mapcode.Image
+            & " " & Quote (Code.Full_Mapcode.Image)
+            & " " & Integer_Image (Code.Territory_Number));
+        end Put_Code;
+        -- Sort if Local
+        Codes : constant Mapcodes.Mapcode_Infos
+              := Encode (Coord, Territory.Image, Shortest, Precision, Local);
+      begin
+        if Local then
+          -- First mapcodes are the shortest and others of same territory
+          if Codes'Length /= 0 then
+            Put_Code (Codes(Codes'First));
+          end if;
+        else
+          for Code of Codes loop
+            Put_Code (Code);
+          end loop;
+        end if;
       end;
       Ada.Text_Io.New_Line;
     elsif Command.Image = "-d" then
@@ -177,6 +198,13 @@ begin
         end if;
       end if;
       Ada.Text_Io.Put_Line (Arg1.Image & " " & Arg2.Image);
+      -- Split <territory>:<mapcode>
+      if Arg2.Is_Null and then Arg1.Locate (":") /= 0 then
+        I := Arg1.Locate (":");
+        Arg2 :=  Arg1.Head (I - 1);
+        Arg1.Delete (1, I);
+      end if;
+      -- Decode
       Coord := Decode (Arg1.Image, Arg2.Image);
       Ada.Text_Io.Put_Line ("=> " & Image (Coord.Lat)
                           & " " & Image (Coord.Lon));
