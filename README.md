@@ -375,6 +375,10 @@ Decode a mapcode with context.
 
 # Version History
 
+### 1.0.7
+
+* Size Territory_Range from Ctrynams.Isofullname length
+
 ### 1.0.6
 
 * Add an option to sort the returned list of mapcodes
