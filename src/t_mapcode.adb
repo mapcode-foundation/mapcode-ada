@@ -20,24 +20,30 @@ with As_U, Mapcodes;
 procedure T_Mapcode is
   use Mapcodes;
 
+  Argument_Error : exception;
+
   procedure Usage is
   begin
     Ada.Text_Io.Put_Line (
       "Usage: " & Ada.Command_Line.Command_Name & " <command>");
     Ada.Text_Io.Put_Line (
-      "  -h                              // This help");
+      "  -h                                    // This help");
     Ada.Text_Io.Put_Line (
-      "  -t <territory>                  // Territory info");
+      "  -t <territory>                        // Territory info");
     Ada.Text_Io.Put_Line (
-      "  -d [ <territory> ] <mapcode>    // Decode");
+      "  -d  <territory_mapcode>               // Decode");
     Ada.Text_Io.Put_Line (
-      "  -d  <territory>:<mapcode>       // Decode");
+      "  -c <lat> <lon> [ <options> ]          // Encode");
     Ada.Text_Io.Put_Line (
-      "  -c <lat> <lon> [ <options> ]    // Encode");
+      "  -a  <territory_mapcode> [ <options> ] // Alternative mapcodes");
     Ada.Text_Io.Put_Line (
-      "  <options>   ::= [ <territory> ] [ <selection> ] [ <precision> ]");
+      "  <territory_mapcode> ::= <territoruy:<mapcode> | [ territory] <mapcode>");
     Ada.Text_Io.Put_Line (
-      "  <selection> ::= [ all | local ] // Default short");
+      "  <options>           ::= [ <territory> ] [ <selection> ] [ <precision> ]");
+    Ada.Text_Io.Put_Line (
+      "  <precision>         ::= P0 | P1 | P2");
+    Ada.Text_Io.Put_Line (
+      "  <selection> ::= [ all | local ]       // Default short");
   end Usage;
 
   function Integer_Image (I : Integer) return String is
@@ -83,7 +89,8 @@ procedure T_Mapcode is
   end Put_Territory;
 
   function Is_Command (Arg : in String) return Boolean is
-    (Arg = "-h" or else Arg = "-t" or else Arg = "-c" or else Arg = "-d");
+    (Arg = "-h" or else Arg = "-t" or else Arg = "-c" or else Arg = "-d"
+     or else Arg = "-a");
 
   function Image (F : Mapcodes.Real) return String is
   begin
@@ -106,6 +113,36 @@ procedure T_Mapcode is
   Shortest : Boolean;
   Local : Boolean;
   Precision : Precisions;
+
+  -- If Arg2 is a mapcde then parse Arg1=Ctx and Arg2=Map
+  --  otherwise parse Arg1=[Ctx:]Map
+  procedure Parse_Mapcode is
+    Index : Natural;
+  begin
+    I := I + 1;
+    Arg1 := As_U.Tus (Ada.Command_Line.Argument (I));
+    Arg2.Set_Null;
+    Tmp.Set_Null;
+    if I < Ada.Command_Line.Argument_Count then
+      Tmp := As_U.Tus (Ada.Command_Line.Argument (I + 1));
+    end if;
+    if Tmp.Locate (".") /= 0 then
+      -- Arg2 is a mapcode
+      Arg2 := Arg1;
+      Arg1 := Tmp;
+      I := I + 1;
+    end if;
+    -- Split <territory>:<mapcode> in Arg1
+    if Arg2.Is_Null then
+      Index := Arg1.Locate (":");
+      if Index > 1 then
+        Arg2 :=  Arg1.Head (Index - 1);
+        Arg1.Delete (1, Index);
+      end if;
+    end if;
+    Ada.Text_Io.Put_Line (Arg1.Image & " " & Arg2.Image);
+  end Parse_Mapcode;
+
 begin
   if Ada.Command_Line.Argument_Count = 0 then
     Usage;
@@ -116,7 +153,7 @@ begin
     if Command.Image = "-h" then
       Usage;
     elsif Command.Image = "-t" then
-      -- Display territory info of next argument
+      -- Display territory info of next argument(s)
       I := I + 1;
       Arg1 := As_U.Tus (Ada.Command_Line.Argument (I));
       if I < Ada.Command_Line.Argument_Count then
@@ -128,13 +165,25 @@ begin
         end if;
       end if;
       Put_Territory (Arg1.Image, Arg2.Image);
-    elsif Command.Image = "-c" then
-      I := I + 1;
-      Arg1 := As_U.Tus (Ada.Command_Line.Argument (I));
-      Coord.Lat := Get (Arg1.Image);
-      I := I + 1;
-      Arg2 := As_U.Tus (Ada.Command_Line.Argument (I));
-      Coord.Lon := Get (Arg2.Image);
+    elsif Command.Image = "-c"
+    or else Command.Image = "-a" then
+      if Command.Image = "-c" then
+        -- Encode a lat lon
+        -- Get coord lat and lon
+        I := I + 1;
+        Arg1 := As_U.Tus (Ada.Command_Line.Argument (I));
+        Coord.Lat := Get (Arg1.Image);
+        I := I + 1;
+        Arg2 := As_U.Tus (Ada.Command_Line.Argument (I));
+        Coord.Lon := Get (Arg2.Image);
+        Ada.Text_Io.Put_Line (Image (Coord.Lat)
+                      & " " & Image (Coord.Lon));
+      else
+        -- Alternative mapcodes
+        Parse_Mapcode;
+        Coord := Decode (Arg1.Image, Arg2.Image);
+      end if;
+      -- Parse options: Territory, selection and precsion
       Territory := As_U.Asu_Null;
       Shortest := True;
       Local := False;
@@ -149,16 +198,16 @@ begin
         elsif Lower_Str (Arg1.Image) = "local" then
           Shortest := True;
           Local := True;
-        elsif Arg1.Length = 1
-        and then Arg1.Element (1) >= '0'
-        and then Arg1.Element (1) <= '2' then
-          Precision := Precisions'Value (Arg1.Image);
+        elsif Arg1.Length = 2
+        and then Arg1.Element (1) = 'P'
+        and then Arg1.Element (2) >= '0'
+        and then Arg1.Element (2) <= '2' then
+          Precision := Precisions'Value (Arg1.Slice (2, 2));
         else
           Territory := Arg1;
         end if;
       end loop;
-      Ada.Text_Io.Put_Line (Image (Coord.Lat)
-                                & " " & Image (Coord.Lon));
+      -- Put mapcodes
       declare
         procedure Put_Code (Code : Mapcodes.Mapcode_Info) is
         begin
@@ -185,40 +234,30 @@ begin
       end;
       Ada.Text_Io.New_Line;
     elsif Command.Image = "-d" then
-      -- Decode next argument, optionally preceeded by a context
-      I := I + 1;
-      Arg1 := As_U.Tus (Ada.Command_Line.Argument (I));
-      Arg2.Set_Null;
-      if I < Ada.Command_Line.Argument_Count then
-        Tmp := As_U.Tus (Ada.Command_Line.Argument (I + 1));
-        if not Is_Command (Tmp.Image) then
-          Arg2 := Arg1;
-          Arg1 := Tmp;
-          I := I + 1;
-        end if;
-      end if;
-      Ada.Text_Io.Put_Line (Arg1.Image & " " & Arg2.Image);
-      -- Split <territory>:<mapcode>
-      if Arg2.Is_Null and then Arg1.Locate (":") /= 0 then
-        I := Arg1.Locate (":");
-        Arg2 :=  Arg1.Head (I - 1);
-        Arg1.Delete (1, I);
-      end if;
+      -- Decode: next argument is mapcode, optionally preceeded by a context
+      Parse_Mapcode;
       -- Decode
       Coord := Decode (Arg1.Image, Arg2.Image);
       Ada.Text_Io.Put_Line ("=> " & Image (Coord.Lat)
                           & " " & Image (Coord.Lon));
+    else
+      raise Argument_Error;
+      return;
     end if;
     I := I + 1;
   end loop;
   Ada.Command_Line.Set_Exit_Status (0);
 exception
   when Mapcodes.Unknown_Territory =>
-    Ada.Text_Io.Put_Line ("Raised Unknown_Territory");
+    Ada.Text_Io.Put_Line (Ada.Text_Io.Standard_Error,
+                          "Raised Unknown_Territory");
     Ada.Command_Line.Set_Exit_Status (1);
   when Mapcodes.Decode_Error =>
-    Ada.Text_Io.Put_Line ("Raised Decode_Error");
+    Ada.Text_Io.Put_Line (Ada.Text_Io.Standard_Error, "Raised Decode_Error");
     Ada.Command_Line.Set_Exit_Status (1);
+  when Argument_Error =>
+    Ada.Text_Io.Put_Line (Ada.Text_Io.Standard_Error, "Invalid Argument");
+    Ada.Command_Line.Set_Exit_Status (2);
   when others =>
     Ada.Command_Line.Set_Exit_Status (2);
     raise;

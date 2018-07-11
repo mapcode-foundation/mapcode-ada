@@ -24,9 +24,10 @@ EPSILON[2]="7.5E-6"
 # Defaults
 export DEBUG=""
 export PRECISION=2
+export SCENARIO=0
 
 function usage {
-  echo "Usage: `basename $0` [ -p <prec> | --precision=<prec> ] [ -d | --debug ]"
+  echo "Usage: `basename $0` [ -p <prec> | --precision=<prec> ] [ -d | --debug ] [ -s | --scenario]"
   echo "    or `basename $0` [ -h | --help ]"
   echo " Default precision: $PRECISION"
 }
@@ -53,6 +54,9 @@ while [ -n "$1" ] ; do
     (--precision=*)
       export PRECISION=${1#*=}
     ;;
+    ("-s"|"--scenario")
+      export SCENARIO=1
+    ;;
     (*)
       error "Invalid arguments"
     ;;
@@ -60,6 +64,7 @@ while [ -n "$1" ] ; do
   shift
 done
 echo Precision $PRECISION
+PRECISION=P${PRECISION}
 
 # Read field $3 of line $2 of file $1
 function readarg {
@@ -174,6 +179,9 @@ while true ; do
   let L=$L+1
 done
 echo OK.
+if [ "$SCENARIO" = "1" ] ; then
+  exit 0
+fi
 
 # Check Territory failures
 echo Failure on territory:
@@ -338,7 +346,7 @@ function decode {
   # Check decoded lat lon versus provided
   enc=`t_mapcode -c $3 $4 $1 $PRECISION`
   enc=`echo $enc | cut -d ">" -f 2 | cut -d " " -f 2-3`
-  dec=`t_mapcode -d $enc $2`
+  dec=`t_mapcode -d $enc`
   dec=`echo $dec | cut -d ">" -f 2`
   res=`check "-d" "$dec" "$3 $4" $PRECISION`
   if [ "$res" != "0" ] ; then

@@ -288,13 +288,16 @@ The command line testing tool `t_mapcode` can perform 3 actions:
 Usage:
 
     t_mapcode <command>
-      -h                                // This help
-      -t <territory>                    // Territory info
-      -d [ <territory> ] <mapcode>      // Decode
-      -d  <territory>:<mapcode>         // Decode
-      -c <lat> <lon> [ <options> ]      // Encode
-      <options>   ::= [ <territory> ] [ <selection> ] [ <precision> ]
-      <selection> ::= [ all | local ]   // Default shortest
+  -h                                    // This help
+  -t <territory>                        // Territory info
+  -d  <territory_mapcode>               // Decode
+  -c <lat> <lon> [ <options> ]          // Encode
+  -a  <territory_mapcode> [ <options> ] // Alternative mapcodes
+  <territory_mapcode> ::= <territory>:<mapcode> | [ territory] <mapcode>
+  <options>           ::= [ <territory> ] [ <selection> ] [ <precision> ]
+  <precision>         ::= P0 | P1 | P2
+  <selection> ::= [ all | local ]       // Default short
+
 
 Default selection leads to encode with Shortest => True, while `all` leads to
 encode with Shortest => False, and 'local' leads to encode with Shortest => True
@@ -373,10 +376,20 @@ Decode a mapcode with context.
     -> NLD 49.4V
     -> => 52.376514000 4.908543375
 
+Put alternative mapcodes for a mapcode (shortests).
+
+    t_mapcode -a NLD 49.4V
+    -> 49.4V NLD
+    -> => NLD 49.4V 'NLD 49.4V' 112
+    -> => AAA VHXGB.1J9J 'VHXGB.1J9J' 532
+
 # Version History
 
 ### 1.0.7
 
+* Add option -a of t_mapcode to list alternative mapcodes and improve parsing of arguments
+* Add new points to the test
+* Add option of fulltest to play only the scenario
 * Size Territory_Range from Ctrynams.Isofullname length
 
 ### 1.0.6
