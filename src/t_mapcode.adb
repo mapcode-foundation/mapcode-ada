@@ -242,7 +242,6 @@ begin
                           & " " & Image (Coord.Lon));
     else
       raise Argument_Error;
-      return;
     end if;
     I := I + 1;
   end loop;
