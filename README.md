@@ -295,8 +295,8 @@ Usage:
   -a  <territory_mapcode> [ <options> ] // Alternative mapcodes
   <territory_mapcode> ::= <territory>:<mapcode> | [ territory] <mapcode>
   <options>           ::= [ <territory> ] [ <selection> ] [ <precision> ]
+  <selection>         ::= [ all | local ]       // Default short
   <precision>         ::= P0 | P1 | P2
-  <selection> ::= [ all | local ]       // Default short
 
 
 Default selection leads to encode with Shortest => True, while `all` leads to

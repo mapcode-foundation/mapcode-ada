@@ -78,7 +78,7 @@ done
 if [ \( $SCENARIO_ONLY -eq 1 \) -a \( $TEST -eq 1 \) ] ; then
   error "Options \"scenario_only\" and \"test\" are mutually exclusive"
 fi
-if [ \( $PRECISION != "1" \) -a \( $PRECISION != "2" \) -a \( $PRECISION != "3" \) ] ; then
+if [ \( $PRECISION != "0" \) -a \( $PRECISION != "1" \) -a \( $PRECISION != "2" \) ] ; then
   error "Invalid precision $PRECISION."
 fi
 echo Precision $PRECISION
@@ -183,8 +183,9 @@ while true ; do
     error "mapcode has exited with code $code"
     exit 1
   fi
+  # Get last (line of) result
   # Skip up to "=> " included and append a space (cause OUTPUT has one)
-  result=`echo $result | cut -d ">" -f 2 | cut -d " " -f 2-`" "
+  result=`echo $result | awk -F "=> " '{print $NF}'`" "
   # Check that result is expected
   res=`check "$CMD" "$result" "$OUTPUT" 0`
   if [ "$res" = "0" ] ; then
