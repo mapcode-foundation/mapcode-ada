@@ -288,15 +288,19 @@ The command line testing tool `t_mapcode` can perform 3 actions:
 Usage:
 
     t_mapcode <command>
-  -h                                    // This help
-  -t <territory>                        // Territory info
-  -d  <territory_mapcode>               // Decode
-  -c <lat> <lon> [ <options> ]          // Encode
-  -a  <territory_mapcode> [ <options> ] // Alternative mapcodes
-  <territory_mapcode> ::= <territory>:<mapcode> | [ territory] <mapcode>
+  -h                                             // This help
+  -t <territory>                                 // Territory info
+  -s <name>                                      // Search territory
+  -d  <territory_mapcode>                        // Decode
+  -c <lat> <lon> [ <options> ]                   // Encode
+  -a  <territory_mapcode> [ <options> ]          // Alternative mapcodes
+  <territory_mapcode> ::= <territory>:<mapcode> | [ <territory> ] <mapcode>
   <options>           ::= [ <territory> ] [ <selection> ] [ <precision> ]
-  <selection>         ::= [ all | local ]       // Default short
-  <precision>         ::= P0 | P1 | P2
+  <selection>         ::= [ all | local | short] // Default short
+                      // Default: one mapcode (the shortest) of each territory
+                      // all: all the mapcodes of all territories
+                      // local: the shortest among all the mapcodes
+  <precision>         ::= P0 | P1 | P2       // Default P0
 
 
 Default selection leads to encode with Shortest => True, while `all` leads to
