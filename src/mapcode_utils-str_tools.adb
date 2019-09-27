@@ -15,7 +15,7 @@
 -- -----------------------------------------------------------------------------
 
 -- Various utilities on strings
-package body Str_Tools is
+package body Mapcode_Utils.Str_Tools is
 
   -- Locate the Nth occurence of a fragment within a string,
   --  between a given index (first/last if 0) and the end/beginning of the
@@ -119,5 +119,5 @@ package body Str_Tools is
     return Result;
   end Mixed_Str;
 
-end Str_Tools;
+end Mapcode_Utils.Str_Tools;
 

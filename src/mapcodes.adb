@@ -14,7 +14,8 @@
 -- limitations under the License.
 -- -----------------------------------------------------------------------------
 
-with Str_Tools, Bits;
+with Mapcode_Utils.Str_Tools, Mapcode_Utils.Bits;
+use Mapcode_Utils;
 with Ndata;
 package body Mapcodes is
 

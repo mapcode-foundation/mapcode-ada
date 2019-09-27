@@ -15,7 +15,7 @@
 -- -----------------------------------------------------------------------------
 
 -- Bit operations
-package Bits is
+package Mapcode_Utils.Bits is
 
   -- Bit and, bit or, bit neg, shift left and shift right
 
@@ -44,5 +44,5 @@ package Bits is
   function Shr (Val : Ll_Integer; Bits : Integer) return Ll_Integer
     with Inline => True;
 
-end Bits;
+end Mapcode_Utils.Bits;
 

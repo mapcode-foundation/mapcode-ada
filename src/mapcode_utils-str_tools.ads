@@ -15,7 +15,7 @@
 -- -----------------------------------------------------------------------------
 
 -- Various utilities on strings
-package Str_Tools is
+package Mapcode_Utils.Str_Tools is
 
   -- Convert the characters of Str into upper char
   function Upper_Str (Str : String) return String;
@@ -43,5 +43,5 @@ package Str_Tools is
                    Occurence  : Positive := 1)
            return Natural;
 
-end Str_Tools;
+end Mapcode_Utils.Str_Tools;
 

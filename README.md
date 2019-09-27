@@ -34,6 +34,7 @@ https://github.com/malaise/ada/tree/master/usr/mapcode
 The following files, in directory `src`, provide utilities for mapcode
 processing:
 
+    mapcode-utils.ads               - Root package of the utilities:
     as_u.ads as_u.adb               - Unbounded strings
     bits.ads bits.adb               - Bit operations
     str_tools.ads str_tools.adb     - String utilities

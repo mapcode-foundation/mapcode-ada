@@ -15,7 +15,7 @@
 -- -----------------------------------------------------------------------------
 
 with Ada.Unchecked_Deallocation;
-package body As_U is
+package body Mapcode_Utils.As_U is
 
   -- Each time a re-allocation is needed, increment Length by
   --   Nb_To_Add + Growth_Offset + Curr_Length / Growth_Factor
@@ -609,5 +609,5 @@ package body As_U is
     Object.Last := 0;
   end Finalize;
 
-end As_U;
+end Mapcode_Utils.As_U;
 

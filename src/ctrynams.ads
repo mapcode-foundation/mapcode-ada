@@ -14,7 +14,8 @@
 -- limitations under the License.
 -- -----------------------------------------------------------------------------
 
-with As_U;
+with Mapcode_Utils.As_U;
+use Mapcode_Utils;
 package Ctrynams is
 
 Isofullname : constant array (Positive range <>) of As_U.Asu_Us := (

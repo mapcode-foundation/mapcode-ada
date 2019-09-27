@@ -16,7 +16,9 @@
 
 -- Mapcode test main program
 with Ada.Command_Line, Ada.Text_Io;
-with As_U, Str_Tools, Mapcodes, Ctrynams;
+with Mapcode_Utils.As_U, Mapcode_Utils.Str_Tools;
+use Mapcode_Utils;
+with Mapcodes, Ctrynams;
 procedure T_Mapcode is
   use Mapcodes;
 
