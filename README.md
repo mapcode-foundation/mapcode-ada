@@ -221,7 +221,7 @@ territories.
 
 With Sort set, return the territory with shortest mapcode first.
 
-    Encode ( (39.730409000, -79.954163500), "", Sortest => False, Sort => False)
+    Encode ( (39.730409000, -79.954163500), "", Shortest => False, Sort => False)
     -> US-WV W2W2.Q41V 'US-WV W2W2.Q41V' 353
     -> US-PA BYLP.73 'US-PA BYLP.73' 361
     -> US-PA HDWQ.NZN 'US-PA HDWQ.NZN' 361
@@ -229,7 +229,7 @@ With Sort set, return the territory with shortest mapcode first.
     -> USA W2W2.Q41V 'USA W2W2.Q41V' 410
     -> AAA S8LY1.RD84 'S8LY1.RD84' 532
 
-    Encode ( (39.730409000, -79.954163500), "", Sortest => False, Sort => True)
+    Encode ( (39.730409000, -79.954163500), "", Shortest => False, Sort => True)
     -> US-PA BYLP.73 'US-PA BYLP.73' 361
     -> US-PA HDWQ.NZN 'US-PA HDWQ.NZN' 361
     -> US-PA W2W2.Q41V 'US-PA W2W2.Q41V' 361
@@ -289,19 +289,19 @@ The command line testing tool `t_mapcode` can perform 3 actions:
 Usage:
 
     t_mapcode <command>
-  -h                                             // This help
-  -t <territory>                                 // Territory info
-  -s <name>                                      // Search territory
-  -d  <territory_mapcode>                        // Decode
-  -c <lat> <lon> [ <options> ]                   // Encode
-  -a  <territory_mapcode> [ <options> ]          // Alternative mapcodes
-  <territory_mapcode> ::= <territory>:<mapcode> | [ <territory> ] <mapcode>
-  <options>           ::= [ <territory> ] [ <selection> ] [ <precision> ]
-  <selection>         ::= [ all | local | short] // Default short
-                      // Default: one mapcode (the shortest) of each territory
-                      // all: all the mapcodes of all territories
-                      // local: the shortest among all the mapcodes
-  <precision>         ::= P0 | P1 | P2       // Default P0
+    -h                                             // This help
+    -t <territory>                                 // Territory info
+    -s <name>                                      // Search territory
+    -d  <territory_mapcode>                        // Decode
+    -c <lat> <lon> [ <options> ]                   // Encode
+    -a  <territory_mapcode> [ <options> ]          // Alternative mapcodes
+    <territory_mapcode> ::= <territory>:<mapcode> | [ <territory> ] <mapcode>
+    <options>           ::= [ <territory> ] [ <selection> ] [ <precision> ]
+    <selection>         ::= [ all | local | short] // Default short
+                        // Default: one mapcode (the shortest) of each territory
+                        // all: all the mapcodes of all territories
+                        // local: the shortest among all the mapcodes
+    <precision>         ::= P0 | P1 | P2       // Default P0
 
 
 Default selection leads to encode with Shortest => True, while `all` leads to
