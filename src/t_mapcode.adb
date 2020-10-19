@@ -53,7 +53,7 @@ procedure T_Mapcode is
     Ada.Text_Io.Put_Line (
       "                      // local: the shortest among all the mapcodes");
     Ada.Text_Io.Put_Line (
-      "  <precision>         ::= P0 | P1 | P2       // Default P0");
+      "  <precision>         ::= P0 | P1 | P2           // Default P0 or from input");
   end Usage;
 
   function Integer_Image (I : Integer) return String is
@@ -131,8 +131,9 @@ procedure T_Mapcode is
   Precision : Precisions;
   Opt_Set, Pre_Set : Boolean;
 
-  -- If Arg2 is a mapcde then parse Arg1=Ctx and Arg2=Map
+  -- If Arg2 is a mapcode then parse Arg1=Ctx and Arg2=Map
   --  otherwise parse Arg1=[Ctx:]Map
+  -- Locate "-" in Map to set Precision
   procedure Parse_Mapcode is
     Index : Natural;
   begin
@@ -156,6 +157,14 @@ procedure T_Mapcode is
         Arg2 :=  Arg1.Head (Index - 1);
         Arg1.Delete (1, Index);
       end if;
+    end if;
+    -- Get precision from input
+    Index := Str_Tools.Locate (Arg1.Image, "-");
+    if Index > 0 then
+      if Index = Arg1.Length or else Index < Arg1.Length - 2 then
+        raise Decode_Error;
+      end if;
+      Precision := Arg1.Length - Index;
     end if;
     Ada.Text_Io.Put_Line (Arg1.Image & " " & Arg2.Image);
   end Parse_Mapcode;
@@ -183,7 +192,7 @@ begin
       end if;
       Put_Territory (Arg1.Image, Arg2.Image);
     elsif Command.Image = "-s" then
-      -- Search contry names
+      -- Search country names
       I := I + 1;
       Territory.Set (Str_Tools.Upper_Str (Ada.Command_Line.Argument (I)));
       for J in Ctrynams.Isofullname'Range loop
@@ -195,6 +204,10 @@ begin
       end loop;
     elsif Command.Image = "-c"
     or else Command.Image = "-a" then
+      -- Default precision for coding
+      --  default precision for alternate mode will be deduced from input
+      -- In any way it can be superseeded by argument
+      Precision := 0;
       if Command.Image = "-c" then
         -- Encode a lat lon
         -- Get coord lat and lon
@@ -219,7 +232,6 @@ begin
       --  not sorted
       Shortest := True;
       Sorted := False;
-      Precision := 0;
       for J in I + 1 .. Ada.Command_Line.Argument_Count loop
         Arg1 := As_U.Tus (Ada.Command_Line.Argument (J));
         exit when Is_Command (Arg1.Image);

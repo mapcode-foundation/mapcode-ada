@@ -21,7 +21,7 @@ package Mapcodes is
 
   Mapcode_C_Version : constant String := "2.0.2";
   Mapcode_Data_Version : constant String := "2.3.0";
-  Mapcode_Ada_Version  : constant String := "1.0.7/Data"
+  Mapcode_Ada_Version  : constant String := "1.0.8/Data"
                                           & Mapcode_Data_Version;
 
   -- Real type (for latitude and longitude)
@@ -30,7 +30,6 @@ package Mapcodes is
   -----------------
   -- TERRITORIES --
   -----------------
-
   -- Valid territory number
   subtype Territory_Range is Natural range 0 .. Ctrynams.Isofullname'Last - 1;
 
@@ -72,8 +71,11 @@ package Mapcodes is
   -- Encoding to mapcodes --
   --------------------------
   -- Coordinate in fraction of degrees
+  subtype Lat_Range is Real range  -90.0 ..  90.0;
+  subtype Lon_Range is Real range -180.0 .. 180.0;
   type Coordinate is record
-     Lat, Lon : Real;
+    Lat : Lat_Range;
+    Lon : Lon_Range;
   end record;
 
   -- One mapcode-related information bloc
