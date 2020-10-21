@@ -35,6 +35,8 @@ procedure T_Mapcode is
     Ada.Text_Io.Put_Line (
       "  -s <name>                                      // Search territory");
     Ada.Text_Io.Put_Line (
+      "  -S <name>                                      // Subdirectories");
+    Ada.Text_Io.Put_Line (
       "  -d  <territory_mapcode>                        // Decode");
     Ada.Text_Io.Put_Line (
       "  -c <lat> <lon> [ <options> ]                   // Encode");
@@ -77,7 +79,8 @@ procedure T_Mapcode is
     return Result;
   end Lower_Str;
 
-  procedure Put_Territory (Territory, Context : in String) is
+  procedure Put_Territory (Territory, Context : in String;
+                           Show_Subdivision : in Boolean) is
     Index : Mapcodes.Territory_Range;
   begin
     Ada.Text_Io.Put (Territory
@@ -90,17 +93,17 @@ procedure T_Mapcode is
       & "/" & Get_Territory_Alpha_Code (Index, Mapcodes.Shortest)
       & "/" & Get_Territory_Fullname (Index) );
     if Is_Subdivision (Index) then
-      Ada.Text_Io.Put_Line ("Parent: "
+      Ada.Text_Io.Put_Line ("  Parent: "
           & Get_Territory_Alpha_Code (Get_Parent_Of (Index)));
     end if;
-    if Has_Subdivision (Index) then
-      Ada.Text_Io.Put_Line ( "Has subdivisions");
+    if Show_Subdivision and then Has_Subdivision (Index) then
+      Ada.Text_Io.Put_Line ( "  Has subdivisions");
     end if;
   end Put_Territory;
 
   function Is_Command (Arg : in String) return Boolean is
-    (Arg = "-h" or else Arg = "-t" or else Arg = "-c" or else Arg = "-d"
-     or else Arg = "-a");
+    (Arg = "-h" or else Arg = "-t" or else Arg = "-s" or else Arg = "-S"
+     or else Arg = "-d" or else Arg = "-c" or else Arg = "-a");
 
   function Image (F : Mapcodes.Real) return String is
   begin
@@ -119,6 +122,9 @@ procedure T_Mapcode is
   function Get (Str : String) return Mapcodes.Real is
   begin
     return Mapcodes.Real'Value (Str);
+  exception
+    when Constraint_Error =>
+      raise Argument_Error;
   end Get;
 
   I : Positive;
@@ -190,7 +196,7 @@ begin
           I := I + 1;
         end if;
       end if;
-      Put_Territory (Arg1.Image, Arg2.Image);
+      Put_Territory (Arg1.Image, Arg2.Image, True);
     elsif Command.Image = "-s" then
       -- Search country names
       I := I + 1;
@@ -199,9 +205,22 @@ begin
         if Str_Tools.Locate (Str_Tools.Upper_Str
                                (Ctrynams.Isofullname(J).Image),
                              Territory.Image) /= 0 then
-          Put_Territory (Image (J-1), "");
+          Put_Territory (Image (J-1), "", True);
         end if;
       end loop;
+    elsif Command.Image = "-S" then
+      I := I + 1;
+      -- Subdirectories with same suffix
+      declare
+        Brothers : constant Mapcodes.Territory_Array
+                 := Mapcodes.Get_Subdivisions_With (
+                     Get_Territory_Number (Ada.Command_Line.Argument (I)));
+      begin
+        for Brother of Brothers loop
+          Put_Territory (Mapcodes.Get_Territory_Alpha_Code (Brother), "",
+                         False);
+        end loop;
+      end;
     elsif Command.Image = "-c"
     or else Command.Image = "-a" then
       -- Default precision for coding
@@ -318,6 +337,9 @@ exception
     Ada.Text_Io.Put_Line (Ada.Text_Io.Standard_Error,
                           "Raised Unknown_Territory");
     Ada.Command_Line.Set_Exit_Status (1);
+  when Mapcodes.Not_A_Subdivision =>
+    Ada.Text_Io.Put_Line (Ada.Text_Io.Standard_Error,
+                          "Raised Not_A_Subdivision");
   when Mapcodes.Decode_Error =>
     Ada.Text_Io.Put_Line (Ada.Text_Io.Standard_Error, "Raised Decode_Error");
     Ada.Command_Line.Set_Exit_Status (1);

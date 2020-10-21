@@ -150,6 +150,13 @@ attribute | description
 `Territory_Number` | `Territory_Range`
 return value | boolean, True if and only if the `Territory_Number` has some subdivisions
 
+`Get_Subdivisions_With` returns the array of territories with the same suffix as provided.
+
+attribute | description
+--- | ---
+`Territory_Number` | `Territory_Range`
+return value | array of `Territory_Range` that have the same subdivision name as the one of `Territory_Number`
+
 ## Converting a Coordinate into Mapcodes
 
 In the mapcode system, territories are limited by rectangles, not by actual or
@@ -292,6 +299,7 @@ Usage:
     -h                                             // This help
     -t <territory>                                 // Territory info
     -s <name>                                      // Search territory
+	-S <name>                                      // Subdirectories
     -d  <territory_mapcode>                        // Decode
     -c <lat> <lon> [ <options> ]                   // Encode
     -a  <territory_mapcode> [ <options> ]          // Alternative mapcodes
@@ -310,20 +318,35 @@ and Shortest => True and to display the first entry of the returnd array.
 
 Examples:
 
-Put information on a territory (providing ISO code or number). The information consists in the
-territory number, followed by three possible mapcodes (Local, International and Shortest), followed by the territory full name.
+Put information on a territory (providing ISO code or number). The information consists in the territory number, followed by three possible mapcodes (Local, International and Shortest), followed by the territory full name.
 
     t_mapcode -t KIR
     -> KIR => 58: KIR/KIR/KIR/Kiribati
 
     t_mapcode -t CA
     -> CA => 391: CA/US-CA/CA/California
-    -> Parent: USA
+    ->   Parent: USA
 
     t_mapcode -t 410
     -> USA => 410: USA/USA/USA/USA
-    -> Has subdivisions
+    ->   Has subdivisions
 
+Search a territory by name.
+
+	t_mapcode -s alabama
+    -> 364 => 364: AL/US-AL/US-AL/Alabama
+	->   Parent: USA
+
+List all subdivisions named "xx-AL".
+
+	t_mapcode -S AL
+	-> US-AL => 364: AL/US-AL/US-AL/Alabama
+    ->   Parent: USA
+    -> BR-AL => 318: AL/BR-AL/BR-AL/Alagoas
+    ->   Parent: BRA
+    -> RU-AL => 482: AL/RU-AL/RU-AL/Altai Republic
+    ->   Parent: RUS
+	
 Encode a coordinate with a context and a precision, put information of the shortest mapcode.
 Information is the mapcode, the territory context of the mapcode, the full mapcode (territory
 and mapcode separated by a space and enclosed by quotes, except for international mapcodes) and territory number.
