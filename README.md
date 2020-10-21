@@ -150,7 +150,7 @@ attribute | description
 `Territory_Number` | `Territory_Range`
 return value | boolean, True if and only if the `Territory_Number` has some subdivisions
 
-`Get_Subdivisions_With` returns the array of territories with the same suffix as provided.
+`Get_Subdivisions_With` returns the array of territories with the same subdivision name (suffix) as the one provided.
 
 attribute | description
 --- | ---
@@ -299,7 +299,7 @@ Usage:
     -h                                             // This help
     -t <territory>                                 // Territory info
     -s <name>                                      // Search territory
-	-S <name>                                      // Subdirectories
+	-S <name>                                      // Same subdivisions
     -d  <territory_mapcode>                        // Decode
     -c <lat> <lon> [ <options> ]                   // Encode
     -a  <territory_mapcode> [ <options> ]          // Alternative mapcodes
