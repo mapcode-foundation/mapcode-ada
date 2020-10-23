@@ -123,7 +123,7 @@ Attribute | Description
 `Territory_Number` | `Territory_Range`
 return value | string, territory name
 
-Examples:
+Example:
 
     Get_Territory_Fullname (391)
     -> California
@@ -150,12 +150,22 @@ attribute | description
 `Territory_Number` | `Territory_Range`
 return value | boolean, True if and only if the `Territory_Number` has some subdivisions
 
-`Get_Subdivisions_With` returns the array of territories with the same subdivision name (suffix) as the one provided.
+`Get_Subdivisions_With` returns the array (possibly empty) of territories with the same subdivision name (suffix) as the one provided.
 
 attribute | description
 --- | ---
 `Subdivision` | String
 return value | array of `Territory_Range` that have the same subdivision name as `Subdivision`
+
+Example:
+
+    Get_Subdivisions_With ("AL")
+	-> US-AL => 364: AL/US-AL/US-AL/Alabama
+         Parent: USA
+       BR-AL => 318: AL/BR-AL/BR-AL/Alagoas
+         Parent: BRA
+       RU-AL => 482: AL/RU-AL/RU-AL/Altai Republic
+         Parent: RUS
 
 ## Converting a Coordinate into Mapcodes
 
