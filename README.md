@@ -154,8 +154,8 @@ return value | boolean, True if and only if the `Territory_Number` has some subd
 
 attribute | description
 --- | ---
-`Territory_Number` | `Territory_Range`
-return value | array of `Territory_Range` that have the same subdivision name as the one of `Territory_Number`
+`Subdivision` | String
+return value | array of `Territory_Range` that have the same subdivision name as `Subdivision`
 
 ## Converting a Coordinate into Mapcodes
 
