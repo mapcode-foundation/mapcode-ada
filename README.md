@@ -224,9 +224,9 @@ for this territory.
 
     Encode ( (52.376514000, 4.908543375 40.786245000), "NLD", Shortest => False)
     -> NLD 49.4V 'NLD 49.4V' 112
-    -> NLD G9.VWG 'NLD G9.VWG' 112
-    -> NLD DL6.H9L 'NLD DL6.H9L' 112
-    -> NLD P25Z.N3Z 'NLD P25Z.N3Z' 112
+       NLD G9.VWG 'NLD G9.VWG' 112
+       NLD DL6.H9L 'NLD DL6.H9L' 112
+       NLD P25Z.N3Z 'NLD P25Z.N3Z' 112
 
 With no limitation to a territory (and `Shortest` set), returns at least a
 worldwide mapcode (territory AAA, code 532), and possibly some mapcodes in
@@ -234,31 +234,31 @@ territories.
 
     Encode ( (52.376514000, 4.908543375 40.786245000) )
     -> NLD 49.4V 'NLD 49.4V' 112
-    -> AAA VHXGB.1J9J 'VHXGB.1J9J' 532
+       AAA VHXGB.1J9J 'VHXGB.1J9J' 532
 
 With Sort set, return the territory with shortest mapcode first.
 
     Encode ( (39.730409000, -79.954163500), "", Shortest => False, Sort => False)
     -> US-WV W2W2.Q41V 'US-WV W2W2.Q41V' 353
-    -> US-PA BYLP.73 'US-PA BYLP.73' 361
-    -> US-PA HDWQ.NZN 'US-PA HDWQ.NZN' 361
-    -> US-PA W2W2.Q41V 'US-PA W2W2.Q41V' 361
-    -> USA W2W2.Q41V 'USA W2W2.Q41V' 410
-    -> AAA S8LY1.RD84 'S8LY1.RD84' 532
+       US-PA BYLP.73 'US-PA BYLP.73' 361
+       US-PA HDWQ.NZN 'US-PA HDWQ.NZN' 361
+       US-PA W2W2.Q41V 'US-PA W2W2.Q41V' 361
+       USA W2W2.Q41V 'USA W2W2.Q41V' 410
+       AAA S8LY1.RD84 'S8LY1.RD84' 532
 
     Encode ( (39.730409000, -79.954163500), "", Shortest => False, Sort => True)
     -> US-PA BYLP.73 'US-PA BYLP.73' 361
-    -> US-PA HDWQ.NZN 'US-PA HDWQ.NZN' 361
-    -> US-PA W2W2.Q41V 'US-PA W2W2.Q41V' 361
-    -> US-WV W2W2.Q41V 'US-WV W2W2.Q41V' 353
-    -> USA W2W2.Q41V 'USA W2W2.Q41V' 410
-    -> AAA S8LY1.RD84 'S8LY1.RD84' 532
+       US-PA HDWQ.NZN 'US-PA HDWQ.NZN' 361
+       US-PA W2W2.Q41V 'US-PA W2W2.Q41V' 361
+       US-WV W2W2.Q41V 'US-WV W2W2.Q41V' 353
+       USA W2W2.Q41V 'USA W2W2.Q41V' 410
+       AAA S8LY1.RD84 'S8LY1.RD84' 532
 
 With a`Precision` of 2, returns high precision mapcodes.
 
     Encode ( (52.376514000, 4.908543375 40.786245000), Precision => 2)
     -> NLD 49.4V-K3 'NLD 49.4V-K3' 112
-    -> AAA VHXGB.1J9J-RD 'VHXGB.1J9J-RD' 532
+       AAA VHXGB.1J9J-RD 'VHXGB.1J9J-RD' 532
 
 
 ## Converting a Mapcode into a Coordinate
@@ -335,27 +335,27 @@ Put information on a territory (providing ISO code or number). The information c
 
     t_mapcode -t CA
     -> CA => 391: CA/US-CA/CA/California
-    ->   Parent: USA
+         Parent: USA
 
     t_mapcode -t 410
     -> USA => 410: USA/USA/USA/USA
-    ->   Has subdivisions
+         Has subdivisions
 
 Search a territory by name.
 
 	t_mapcode -s alabama
     -> 364 => 364: AL/US-AL/US-AL/Alabama
-	->   Parent: USA
+	     Parent: USA
 
 List all subdivisions named "xx-AL".
 
 	t_mapcode -S AL
 	-> US-AL => 364: AL/US-AL/US-AL/Alabama
-    ->   Parent: USA
-    -> BR-AL => 318: AL/BR-AL/BR-AL/Alagoas
-    ->   Parent: BRA
-    -> RU-AL => 482: AL/RU-AL/RU-AL/Altai Republic
-    ->   Parent: RUS
+         Parent: USA
+       BR-AL => 318: AL/BR-AL/BR-AL/Alagoas
+         Parent: BRA
+       RU-AL => 482: AL/RU-AL/RU-AL/Altai Republic
+         Parent: RUS
 	
 Encode a coordinate with a context and a precision, put information of the shortest mapcode.
 Information is the mapcode, the territory context of the mapcode, the full mapcode (territory
@@ -363,87 +363,97 @@ and mapcode separated by a space and enclosed by quotes, except for internationa
 
     t_mapcode -c 52.376482500 4.908511796 NLD 2
     ->   52.376482500    4.908511796
-    -> => NLD 49.4V-V2 'NLD 49.4V-V2' 112
+       => NLD 49.4V-V2 'NLD 49.4V-V2' 112
 
 Put all shorters mapcodes of a coordinate (no context).
 
     t_mapcode -c 52.376482500 4.908511796 
     ->  52.376482500    4.908511796
-    -> => NLD 49.4V 'NLD 49.4V' 112
-    -> => AAA VHXGB.1J9J 'VHXGB.1J9J' 532
+       => NLD 49.4V 'NLD 49.4V' 112
+       => AAA VHXGB.1J9J 'VHXGB.1J9J' 532
 
 Put all mapcodes of a coordinate with a context.
 
     t_mapcode -c 52.376482500 4.908511796 NLD false
-    ->  52.376482500    4.908511796
-    -> => 49.4V NLD 'NLD 49.4V' 112
-    -> => G9.VWG NLD 'NLD G9.VWG' 112
-    -> => DL6.H9L NLD 'NLD DL6.H9L' 112
-    -> => P25Z.N3Z NLD 'NLD P25Z.N3Z' 112
+    -> 52.376482500    4.908511796
+       => 49.4V NLD 'NLD 49.4V' 112
+       => G9.VWG NLD 'NLD G9.VWG' 112
+       => DL6.H9L NLD 'NLD DL6.H9L' 112
+       => P25Z.N3Z NLD 'NLD P25Z.N3Z' 112
 
 Put all mapcodes of a coordinate.
 
     t_mapcode -c 39.730409000  -79.954163500 all 
     -> 39.730409000  -79.954163500
-    -> => US-WV W2W2.Q41V 'US-WV W2W2.Q41V' 353
-    -> => US-PA BYLP.73 'US-PA BYLP.73' 361
-    -> => US-PA HDWQ.NZN 'US-PA HDWQ.NZN' 361
-    -> => US-PA W2W2.Q41V 'US-PA W2W2.Q41V' 361
-    -> => USA W2W2.Q41V 'USA W2W2.Q41V' 410
-    -> => AAA S8LY1.RD84 'S8LY1.RD84' 532
+       => US-WV W2W2.Q41V 'US-WV W2W2.Q41V' 353
+       => US-PA BYLP.73 'US-PA BYLP.73' 361
+       => US-PA HDWQ.NZN 'US-PA HDWQ.NZN' 361
+       => US-PA W2W2.Q41V 'US-PA W2W2.Q41V' 361
+       => USA W2W2.Q41V 'USA W2W2.Q41V' 410
+       => AAA S8LY1.RD84 'S8LY1.RD84' 532
 
 Put the local mapcode of a coordinate.
 
     t_mapcode -c 39.730409000  -79.954163500 local
     -> 39.730409000  -79.954163500
-    -> => US-PA BYLP.73 'US-PA BYLP.73' 361
+       => US-PA BYLP.73 'US-PA BYLP.73' 361
 
 Decode a mapcode, no context.
 
     t_mapcode -d 49.4V
     -> 49.4V
-    -> raised MAPCODES.DECODE_ERROR
+       raised MAPCODES.DECODE_ERROR
 
     t_mapcode -d VHXGB.1J9J
     -> VHXGB.1J9J
-    -> => 52.376504000 4.908535500
+       => 52.376504000 4.908535500
 
 Decode a mapcode with context.
 
     t_mapcode -d NLD 49.4V 
     -> NLD 49.4V
-    -> => 52.376514000 4.908543375
+       => 52.376514000 4.908543375
 
 Put alternative mapcodes for a mapcode (shortests).
 
     t_mapcode -a NLD 49.4V
     -> 49.4V NLD
-    -> => NLD 49.4V 'NLD 49.4V' 112
-    -> => AAA VHXGB.1J9J 'VHXGB.1J9J' 532
+       => NLD 49.4V 'NLD 49.4V' 112
+       => AAA VHXGB.1J9J 'VHXGB.1J9J' 532
 
 # Version History
 
-### 1.0.7
+### 1.0.11
+* Rewrite Iso2Ccode
 
+### 1.0.10
+* Resolve subdivision without territory only if unambiguous
+* Reject subdivision with wrong territory
+* Get_Subdivisions_With takes a subdivision simple code
+
+### 1.0.9
+* Add function Get_Subdivisions_With that lists subdivisions with same suffix
+
+### 1.0.8
+* Remove parsing of partial context in the mapcode to decode
+
+### 1.0.7
 * Add option -a of t_mapcode to list alternative mapcodes and improve parsing of arguments
 * Add new points to the test
 * Add option of fulltest to play only the scenario
 * Size Territory_Range from Ctrynams.Isofullname length
 
 ### 1.0.6
-
 * Add an option to sort the returned list of mapcodes
 * Add to t_mapcode a "local/all" option and support for "\<territory\>:\<mapcode\>"
 
 ### 1.0.4
-
 * Fix detection of invalid character in mapcode extension
 * Improve comments
 * In t_mapcode arguments and inputs, move the optional context before the mapcode
 * Remove useless ctrynams_short.ads
 
 ### 1.0.0
-
 * Update years of copyright
 * Fix and improve accuracy
 * Add automatic tests of territory, encoding and decoding, including expected
