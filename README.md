@@ -68,7 +68,7 @@ subdivisions.
 `Get_Territory_Number` returns the territory number of a territory code. An
 optional context helps to interpret ambiguous (abbreviated) alphacodes of
 subdivisions, such as "AL". If several subdivisions match the specification (no
-context provided) it returns the lowest number that matches.
+context provided) it raises the exception `Unknown_Territory`.
 
 Attribute | Description
 --- | ---
@@ -79,10 +79,10 @@ exceptions | `Unknown_Territory` if the territory code is not known
 
 Examples:
 
-First territory matching an ambiguous code.
+Search a territory with an ambiguous code.
 
     Get_Territory_Number ("AR")
-    -> 365              // US-AR/Arkansas
+    -> Unknown_Territory
 
 Non ambiguous code.
 
@@ -189,7 +189,7 @@ attribute | description
 `Coord` | coordinate (latitude and longitude in degrees, reals) to encode as mapcodes
 `Territory` | optional string, (an ISO code such as “NLD”) territory for the scope of the mapcodes
 `Shortest` | boolean, default True, to return only the shortest possible mapcode for the territory or each possible territory
-`Precision` | 0, 1 or 2, default 0, precision of the mapcode to generate
+`Precision` | 0 to 8, default 0, precision of the mapcode to generate
 `Sort` | sort the territories so that the shortest mapcode appears first
 return value | array of mapcode informations (territory ISO code, mapcode, full mapcode, and territory number)
 
@@ -319,7 +319,7 @@ Usage:
                         // Default: one mapcode (the shortest) of each territory
                         // all: all the mapcodes of all territories
                         // local: the shortest among all the mapcodes
-    <precision>         ::= P0 | P1 | P2       // Default P0
+    <precision>         ::= P0 to P8               // Default P0
 
 
 Default selection leads to encode with Shortest => True, while `all` leads to
@@ -361,7 +361,7 @@ Encode a coordinate with a context and a precision, put information of the short
 Information is the mapcode, the territory context of the mapcode, the full mapcode (territory
 and mapcode separated by a space and enclosed by quotes, except for international mapcodes) and territory number.
 
-    t_mapcode -c 52.376482500 4.908511796 NLD 2
+    t_mapcode -c 52.376482500 4.908511796 NLD P2
     ->   52.376482500    4.908511796
        => NLD 49.4V-V2 'NLD 49.4V-V2' 112
 
@@ -422,6 +422,9 @@ Put alternative mapcodes for a mapcode (shortests).
        => AAA VHXGB.1J9J 'VHXGB.1J9J' 532
 
 # Version History
+
+### 1.0.12
+* Support encoding precision up to 8
 
 ### 1.0.11
 * Rewrite Iso2Ccode
