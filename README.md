@@ -58,47 +58,54 @@ library.
 ## Operations related to territories
 
 A territory is identified by a code (an ISO 3166 code such as “NLD” or "US-DC"),
-with some possible aliases (example "US" = "USA"), and a unique number, from 0
-for "VAT" (Vatican), to 532 for "AAA" (International), defined as
-`Territory_Range`.
+with some possible aliases (example "US" = "USA"), or by a unique territory identifier of (a private) type  `Territories`. 
 
 Large territories (MX, IN, AU, BR, US, CA, RU and CN) are decomposed into
 subdivisions.
 
-`Get_Territory_Number` returns the territory number of a territory code. An
-optional context helps to interpret ambiguous (abbreviated) alphacodes of
-subdivisions, such as "AL". If several subdivisions match the specification (no
-context provided) it raises the exception `Unknown_Territory`.
+`Image` of a territory returns the string image of a territory, from "0"
+for "VAT" (Vatican), to "532" for "AAA" (International).
 
 Attribute | Description
 --- | ---
-`Territory` | string, mapcode to decode
+`Territory` | `Territories`, the identifier of the territory to put the image of
+return value | string image of `Territory`
+
+`Get_Territory` returns the territory identifier of a territory code. An
+optional context helps to interpret ambiguous (abbreviated) alphacodes of
+subdivisions, such as "AL". If the territory code is not known or if several
+subdivisions match the specification (no context provided) it raises the exception `Unknown_Territory`.
+
+Attribute | Description
+--- | ---
+`Territory_Code` | string, the ISO code such as “USA”, or identifier image such
+as "232", to search for
 `Context` | optional string, (an ISO code such as “US”) territory for a subdivision
-return value | `Territory_Range`, territory number
-exceptions | `Unknown_Territory` if the territory code is not known
+return value | `Territories`, territory identifier
+exceptions | `Unknown_Territory` if the territory code is not known or ambiguous
 
 Examples:
 
 Search a territory with an ambiguous code.
 
-    Get_Territory_Number ("AR")
+    Get_Territory ("AR")
     -> Unknown_Territory
 
 Non ambiguous code.
 
-    Get_Territory_Number ("IN-AR")
+    Get_Territory ("IN-AR")
     -> 285              // IN-AR/Arunachal Pradesh
 
 Ambiguous code and context.
 
-    Get_Territory_Number ("IN", "AR")
+    Get_Territory ("IN", "AR")
     -> 285              // IN-AR/Arunachal Pradesh
 
 `Get_Territory_Alpha_Code` returns the territory ISO 3166 code of a territory.
 
 Attribute | Description
 --- | ---
-`Territory_Number` | `Territory_Range`
+`Territory` | `Territories`
 `Format` | `Local` (often ambiguous), `International` (full and unambiguous, default), or `Shortest`
 return value | string, territory ISO code
 
@@ -120,7 +127,7 @@ Examples:
 
 Attribute | Description
 --- | ---
-`Territory_Number` | `Territory_Range`
+`Territory` | `Territories`
 return value | string, territory name
 
 Example:
@@ -128,34 +135,34 @@ Example:
     Get_Territory_Fullname (391)
     -> California
 
-`Get_Parent_Of` returns the parent territory number of a subdivision.
+`Get_Parent_Of` returns the parent territory of a subdivision.
 
 Attribute | Description
 --- | ---
-`Territory_Number` | `Territory_Range`
-return value | `Territory_Range`, parent territory number
-exceptions | `Not_A_Subdivision`, if the `Territory_Number` has no parent (i.e. is not a subdivision)
+`Territory` | `Territories`
+return value | `Territories`, parent territory identifier
+exceptions | `Not_A_Subdivision`, if the `Territory` has no parent (i.e. is not a subdivision)
 
 `Is_Subdivision` returns True if the provided territory is a subdivision.
 
 attribute | description
 --- | ---
-`Territory_Number` | `Territory_Range`
-return value | boolean, True if and only if the `Territory_Number` is a subdivision
+`Territory` | `Territories`
+return value | boolean, True if and only if the `Territory` is a subdivision
 
 `Has_Subdivision` returns True if the provided territory has subdivisions.
 
 attribute | description
 --- | ---
-`Territory_Number` | `Territory_Range`
-return value | boolean, True if and only if the `Territory_Number` has some subdivisions
+`Territory` | `Territories`
+return value | boolean, True if and only if the `Territory` has some subdivisions
 
 `Get_Subdivisions_With` returns the array (possibly empty) of territories with the same subdivision name (suffix) as the one provided.
 
 attribute | description
 --- | ---
 `Subdivision` | String
-return value | array of `Territory_Range` that have the same subdivision name as `Subdivision`
+return value | array of `Territories` that have the same subdivision name as `Subdivision`
 
 Example:
 
@@ -187,7 +194,7 @@ The operation returns an array (possibly with only one element) of mapcodes.
 attribute | description 
 --- | --- 
 `Coord` | coordinate (latitude and longitude in degrees, reals) to encode as mapcodes
-`Territory` | optional string, (an ISO code such as “NLD”) territory for the scope of the mapcodes
+`Territory` | optional string, (an ISO code such as “NLD” or territory image such as "112") territory for the scope of the mapcodes
 `Shortest` | boolean, default True, to return only the shortest possible mapcode for the territory or each possible territory
 `Precision` | 0 to 8, default 0, precision of the mapcode to generate
 `Sort` | sort the territories so that the shortest mapcode appears first
@@ -202,7 +209,7 @@ If Sort is set, then the returned array contains first the shortest
 mapcode, then possibly the other mapcodes for the same territory,
 then possibly mapcodes for other territories, then possibly the
 international (Earth) mapcode, otherwise the territories appear in the crescent
-order of Territory_Range (see package Ctrynams).  
+order of Territories (see package Ctrynams).  
 As a consequence, if it appears, the international mapcode is always the last.
 
 Examples:
@@ -286,12 +293,12 @@ Without any `Context`, only accept a worldwide mapcode.
     Raises Decode_Error             // Ambiguous
  
     Decode ("VHXGB.1J9J")
-    -> (52.376504000, 4.908535500)
+    -> (52.376504000000, 4.908535500000)
 
 With a `Context` set, decode a short mapcode.
 
     Decode ("49.4V", "NLD")
-    -> (52.376514000, 4.908543375)
+    -> (52.376514000001, 4.908543375000)
 
 # Using the testing program
 
@@ -308,8 +315,8 @@ Usage:
     t_mapcode <command>
     -h                                             // This help
     -t <territory>                                 // Territory info
-    -s <name>                                      // Search territory
-	-S <name>                                      // Same subdivisions
+    -s <subdivision>                               // Same subdivisions
+	-S <name>                                      // Search territory
     -d  <territory_mapcode>                        // Decode
     -c <lat> <lon> [ <options> ]                   // Encode
     -a  <territory_mapcode> [ <options> ]          // Alternative mapcodes
@@ -406,13 +413,13 @@ Decode a mapcode, no context.
 
     t_mapcode -d VHXGB.1J9J
     -> VHXGB.1J9J
-       => 52.376504000 4.908535500
+       => 52.376504000000 4.908535500000
 
 Decode a mapcode with context.
 
     t_mapcode -d NLD 49.4V 
     -> NLD 49.4V
-       => 52.376514000 4.908543375
+       => 52.376514000001 4.908543375000
 
 Put alternative mapcodes for a mapcode (shortests).
 
@@ -422,6 +429,14 @@ Put alternative mapcodes for a mapcode (shortests).
        => AAA VHXGB.1J9J 'VHXGB.1J9J' 532
 
 # Version History
+
+### 1.1.2
+* Make Territory_Number a private type and rename it
+* Add the function Image of a territory
+* Test with any precision (0 to 8)
+* Swap options S and s
+* Improve resolution to 12 digits
+* Align length of country names and codes
 
 ### 1.0.12
 * Support encoding precision up to 8
