@@ -31,19 +31,20 @@ https://github.com/malaise/ada/tree/master/usr/mapcode
 
 # Ada Files for Mapcode Support
 
-The following files, in directory `src`, provide utilities for mapcode
+The following files, in directory `src`, provide utilities and data for mapcode
 processing:
 
-    mapcode-utils.ads               - Root package of the utilities:
-    as_u.ads as_u.adb               - Unbounded strings
-    bits.ads bits.adb               - Bit operations
-    str_tools.ads str_tools.adb     - String utilities
+    mapcode-utils.ads             - Root package of the utilities:
+    as_u.ads as_u.adb             - Unbounded strings
+    bits.ads bits.adb             - Bit operations
+    str_tools.ads str_tools.adb   - String utilities
+	ndata.ads                     - Private data table for mapcode support
 
 The following files provide the Ada interface for mapcodes:
 
-    mapcode.ads mapcode.adb         - Key operations for mapcode support
-    ndata.ads                       - Data table for mapcode support
-    ctrynams.ads                    - Names of territories (in English)
+    mapcode.ads mapcode.adb       - Key operations for mapcode support
+	countries.ads                 - Nums, Codes and Names of territories
+    
 
 The following file contains the main procedure for testing the interfaces:
 
@@ -57,19 +58,13 @@ library.
 
 ## Operations related to territories
 
-A territory is identified by a code (an ISO 3166 code such as “NLD” or "US-DC"),
-with some possible aliases (example "US" = "USA"), or by a unique territory identifier of (a private) type  `Territories`. 
+A territory is identified either by a number (a string of 1 to 3 digits such as "42"), or by a code (an ISO 3166 code such as “NLD” or "US-DC")
+with some possible aliases (example "US" = "USA"). 
+
+A territory is designated by a unique territory identifier of (a private) type  `Territories`. 
 
 Large territories (MX, IN, AU, BR, US, CA, RU and CN) are decomposed into
 subdivisions.
-
-`Image` of a territory returns the string image of a territory, from "0"
-for "VAT" (Vatican), to "532" for "AAA" (International).
-
-Attribute | Description
---- | ---
-`Territory` | `Territories`, the identifier of the territory to put the image of
-return value | string image of `Territory`
 
 `Get_Territory` returns the territory identifier of a territory code. An
 optional context helps to interpret ambiguous (abbreviated) alphacodes of
@@ -78,8 +73,7 @@ subdivisions match the specification (no context provided) it raises the excepti
 
 Attribute | Description
 --- | ---
-`Territory_Code` | string, the ISO code such as “USA”, or identifier image such
-as "232", to search for
+`Territory_Code` | string, the ISO code such as “USA”, or identifier image such as "232", to search for
 `Context` | optional string, (an ISO code such as “US”) territory for a subdivision
 return value | `Territories`, territory identifier
 exceptions | `Unknown_Territory` if the territory code is not known or ambiguous
@@ -100,6 +94,14 @@ Ambiguous code and context.
 
     Get_Territory ("IN", "AR")
     -> 285              // IN-AR/Arunachal Pradesh
+
+`Get_Territory_Number` of a territory returns the string image of a territory, from "0" for "VAT" (Vatican), to "532" for "AAA" (International).
+
+Attribute | Description
+--- | ---
+`Territory` | `Territories`, the identifier of the territory to get the number of
+return value | string image of the number of `Territory`
+
 
 `Get_Territory_Alpha_Code` returns the territory ISO 3166 code of a territory.
 
@@ -167,12 +169,10 @@ return value | array of `Territories` that have the same subdivision name as `Su
 Example:
 
     Get_Subdivisions_With ("AL")
-	-> US-AL => 364: AL/US-AL/US-AL/Alabama
-         Parent: USA
-       BR-AL => 318: AL/BR-AL/BR-AL/Alagoas
-         Parent: BRA
-       RU-AL => 482: AL/RU-AL/RU-AL/Altai Republic
-         Parent: RUS
+	-> 364    // US-AL
+       318    // BR-AL
+       482    // RU-AL
+ 
 
 ## Converting a Coordinate into Mapcodes
 
@@ -194,7 +194,7 @@ The operation returns an array (possibly with only one element) of mapcodes.
 attribute | description 
 --- | --- 
 `Coord` | coordinate (latitude and longitude in degrees, reals) to encode as mapcodes
-`Territory` | optional string, (an ISO code such as “NLD” or territory image such as "112") territory for the scope of the mapcodes
+`Territory` | optional string, (an ISO code such as “NLD” or territory number such as "112") territory for the scope of the mapcodes
 `Shortest` | boolean, default True, to return only the shortest possible mapcode for the territory or each possible territory
 `Precision` | 0 to 8, default 0, precision of the mapcode to generate
 `Sort` | sort the territories so that the shortest mapcode appears first
@@ -281,7 +281,7 @@ raises the exception `Decode_Error` if the mapcode is not valid or ambiguous
 Attribute | Description 
 --- | --- 
 `Mapcode` | string, mapcode to decode
-`Context` | optional string, (an ISO code such as “NLD”) territory for the scope of the mapcode
+`Context` | optional string, (an ISO code such as “NLD” or territory number such as "112") territory for the scope of the mapcode
 return value | coordinate (latitude and longitude in degrees), reals
 exceptions | `Decode_Error`, if the mapcode is invalid or ambiguous in the Context
 
@@ -429,6 +429,13 @@ Put alternative mapcodes for a mapcode (shortests).
        => AAA VHXGB.1J9J 'VHXGB.1J9J' 532
 
 # Version History
+
+### 1.1.4
+* Move apart the public characteristics of territories
+* Rename Image into Get_Territory_Number
+
+### 1.1.3
+* Rename Get_Territory_Number into Get_Territory
 
 ### 1.1.2
 * Make Territory_Number a private type and rename it

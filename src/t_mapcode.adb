@@ -18,7 +18,7 @@
 with Ada.Command_Line, Ada.Text_Io;
 with Mapcode_Utils.As_U, Mapcode_Utils.Str_Tools;
 use Mapcode_Utils;
-with Mapcodes, Ctrynams;
+with Mapcodes, Countries;
 procedure T_Mapcode is
   use Mapcodes;
 
@@ -79,7 +79,7 @@ procedure T_Mapcode is
                    & (if Context /= "" then " " else "")
                    & Context &  " ");
     Index := Get_Territory (Territory, Context);
-    Ada.Text_Io.Put_Line ("=> " & Image (Index)
+    Ada.Text_Io.Put_Line ("=> " & Get_Territory_Number (Index)
       & ": " & Get_Territory_Alpha_Code (Index, Mapcodes.Local)
       & "/" & Get_Territory_Alpha_Code (Index, Mapcodes.International)
       & "/" & Get_Territory_Alpha_Code (Index, Mapcodes.Shortest)
@@ -100,12 +100,6 @@ procedure T_Mapcode is
   function Image (F : Mapcodes.Real) return String is
   begin
     return F'Img;
-  end Image;
-
-  function Image (I : Natural) return String is
-    Str : constant String := I'Img;
-  begin
-    return Str(Natural'Succ(Str'First) .. Str'Last);
   end Image;
 
   function Quote (Str : String) return String is
@@ -206,12 +200,12 @@ begin
       -- Search country names
       I := I + 1;
       Territory.Set (Str_Tools.Upper_Str (Ada.Command_Line.Argument (I)));
-      for J in Ctrynams.Isofullname'Range loop
+      for J in Countries.Territories_Def'Range loop
         if Str_Tools.Locate (Str_Tools.Upper_Str
-                               (Ctrynams.Isofullname(J).Image),
+                               (Countries.Territories_Def(J).Name.Image),
                              Territory.Image) /= 0 then
           -- Territory number is Index - 1
-          Put_Territory (Image (J-1), "", True);
+          Put_Territory (Countries.Territories_Def(J).Code.Image, "", True);
         end if;
       end loop;
     elsif Command.Image = "-c"
@@ -293,7 +287,7 @@ begin
             & Code.Territory_Alpha_Code.Image
             & " " &  Code.Mapcode.Image
             & " " & Quote (Code.Full_Mapcode.Image)
-            & " " & Image (Code.Territory));
+            & " " & Get_Territory_Number (Code.Territory));
         end Put_Code;
         -- Sort if Local
         Codes : constant Mapcodes.Mapcode_Infos
