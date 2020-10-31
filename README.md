@@ -61,10 +61,10 @@ library.
 A territory is identified either by a number (a string of 1 to 3 digits such as "42"), or by a code (an ISO 3166 code such as “NLD” or "US-DC")
 with some possible aliases (example "US" = "USA"). 
 
-A territory is designated by a unique territory identifier of (a private) type  `Territories`. 
-
 Large territories (MX, IN, AU, BR, US, CA, RU and CN) are decomposed into
 subdivisions.
+
+A territory is designated by a unique territory identifier of (a private) type  `Territories`. 
 
 `Get_Territory` returns the territory identifier of a territory code. An
 optional context helps to interpret ambiguous (abbreviated) alphacodes of
@@ -73,8 +73,8 @@ subdivisions match the specification (no context provided) it raises the excepti
 
 Attribute | Description
 --- | ---
-`Territory_Code` | string, the ISO code such as “USA”, or identifier image such as "232", to search for
-`Context` | optional string, (an ISO code such as “US”) territory for a subdivision
+`Territory_Code` | string, the ISO code such as “USA”, or number image such as "232" of the territory to search
+`Context` | optional string, an ISO code such as “US” (but territory numbers are not accepted) indicating the territory when `Territory_Code` is a subdivision
 return value | `Territories`, territory identifier
 exceptions | `Unknown_Territory` if the territory code is not known or ambiguous
 
@@ -108,7 +108,7 @@ return value | string image of the number of `Territory`
 Attribute | Description
 --- | ---
 `Territory` | `Territories`
-`Format` | `Local` (often ambiguous), `International` (full and unambiguous, default), or `Shortest`
+`Format` | either `Local` (often ambiguous), `International` (full and unambiguous, default), or `Shortest`
 return value | string, territory ISO code
 
 Examples:
@@ -125,7 +125,7 @@ Examples:
     Get_Territory_Alpha_Code (391, Shortest)
     -> "CA"           // US-CA, not ambiguous
 
-`Get_Territory_Fullname` returns the full common name of a territory
+`Get_Territory_Fullname` returns the full common name of a territory. From the names defined in package Countries, this is the string up to the first ' (' if any.
 
 Attribute | Description
 --- | ---
@@ -194,7 +194,7 @@ The operation returns an array (possibly with only one element) of mapcodes.
 attribute | description 
 --- | --- 
 `Coord` | coordinate (latitude and longitude in degrees, reals) to encode as mapcodes
-`Territory` | optional string, (an ISO code such as “NLD” or territory number such as "112") territory for the scope of the mapcodes
+`Territory` | optional string, an ISO code (such as “NLD”) or territory number (such as "112") to restrict the territory scope of the mapcodes
 `Shortest` | boolean, default True, to return only the shortest possible mapcode for the territory or each possible territory
 `Precision` | 0 to 8, default 0, precision of the mapcode to generate
 `Sort` | sort the territories so that the shortest mapcode appears first
@@ -209,27 +209,27 @@ If Sort is set, then the returned array contains first the shortest
 mapcode, then possibly the other mapcodes for the same territory,
 then possibly mapcodes for other territories, then possibly the
 international (Earth) mapcode, otherwise the territories appear in the crescent
-order of Territories (see package Ctrynams).  
+order of Territories (see package Countries).  
 As a consequence, if it appears, the international mapcode is always the last.
 
 Examples:
 
-With a`Territory` specified, and `Shortest` set, returns the default mapcode for this
+With a `Territory` specified, and `Shortest` set, returns the default mapcode for this
 territory.
 
-    Encode ( (52.376514000, 4.908543375 40.786245000), "NLD")
+    Encode ( (52.376514000001, 4.908543375000), "NLD")
     -> NLD 49.4V 'NLD 49.4V' 112
 
 With a Territory set to Earth ("AAA"), returns the international mapcode,
 (whatever Shortest)
 
-    Encode ( (52.376514000, 4.908543375 40.786245000), "AAA")
+    Encode ( (52.376514000001, 4.908543375000), "AAA")
     -> AAA VHXGB.1J9J 'VHXGB.1J9J' 532
 
 With a `Territory` specified, and `Shortest`set to False, returns all the possible mapcodes
 for this territory.
 
-    Encode ( (52.376514000, 4.908543375 40.786245000), "NLD", Shortest => False)
+    Encode ( (52.376514000001, 4.908543375000), "NLD", Shortest => False)
     -> NLD 49.4V 'NLD 49.4V' 112
        NLD G9.VWG 'NLD G9.VWG' 112
        NLD DL6.H9L 'NLD DL6.H9L' 112
@@ -239,7 +239,7 @@ With no limitation to a territory (and `Shortest` set), returns at least a
 worldwide mapcode (territory AAA, code 532), and possibly some mapcodes in
 territories.
 
-    Encode ( (52.376514000, 4.908543375 40.786245000) )
+    Encode ( (52.376514000001, 4.908543375000) )
     -> NLD 49.4V 'NLD 49.4V' 112
        AAA VHXGB.1J9J 'VHXGB.1J9J' 532
 
@@ -261,9 +261,9 @@ With Sort set, return the territory with shortest mapcode first.
        USA W2W2.Q41V 'USA W2W2.Q41V' 410
        AAA S8LY1.RD84 'S8LY1.RD84' 532
 
-With a`Precision` of 2, returns high precision mapcodes.
+With a `Precision` of 2, returns higher precision mapcodes.
 
-    Encode ( (52.376514000, 4.908543375 40.786245000), Precision => 2)
+    Encode ( (52.376514000001, 4.908543375000), Precision => 2)
     -> NLD 49.4V-K3 'NLD 49.4V-K3' 112
        AAA VHXGB.1J9J-RD 'VHXGB.1J9J-RD' 532
 
@@ -281,7 +281,7 @@ raises the exception `Decode_Error` if the mapcode is not valid or ambiguous
 Attribute | Description 
 --- | --- 
 `Mapcode` | string, mapcode to decode
-`Context` | optional string, (an ISO code such as “NLD” or territory number such as "112") territory for the scope of the mapcode
+`Context` | optional string, an ISO code (such as “NLD”) or territory number (such as "112") to indicate territory for the scope of the mapcode
 return value | coordinate (latitude and longitude in degrees), reals
 exceptions | `Decode_Error`, if the mapcode is invalid or ambiguous in the Context
 
@@ -302,9 +302,9 @@ With a `Context` set, decode a short mapcode.
 
 # Using the testing program
 
-The command line testing tool `t_mapcode` can perform 3 actions:
+The command line testing tool `t_mapcode` can perform mainly three actions:
 
-* Display information on a territory number or territory ISO 3166 code
+* Display information on a territory
 
 * Decode a mapcode (with an optional context) into a coordinate
 
@@ -317,9 +317,9 @@ Usage:
     -t <territory>                                 // Territory info
     -s <subdivision>                               // Same subdivisions
 	-S <name>                                      // Search territory
-    -d  <territory_mapcode>                        // Decode
+    -d <territory_mapcode>                         // Decode
     -c <lat> <lon> [ <options> ]                   // Encode
-    -a  <territory_mapcode> [ <options> ]          // Alternative mapcodes
+    -a <territory_mapcode> [ <options> ]           // Alternative mapcodes
     <territory_mapcode> ::= <territory>:<mapcode> | [ <territory> ] <mapcode>
     <options>           ::= [ <territory> ] [ <selection> ] [ <precision> ]
     <selection>         ::= [ all | local | short] // Default short
@@ -331,7 +331,7 @@ Usage:
 
 Default selection leads to encode with Shortest => True, while `all` leads to
 encode with Shortest => False, and 'local' leads to encode with Shortest => True
-and Shortest => True and to display the first entry of the returnd array.
+and Shortest => True and to display the first entry of the returned array.
 
 Examples:
 
@@ -348,25 +348,25 @@ Put information on a territory (providing ISO code or number). The information c
     -> USA => 410: USA/USA/USA/USA
          Has subdivisions
 
-Search a territory by name.
-
-	t_mapcode -s alabama
-    -> 364 => 364: AL/US-AL/US-AL/Alabama
-	     Parent: USA
-
 List all subdivisions named "xx-AL".
 
-	t_mapcode -S AL
+	t_mapcode -s AL
 	-> US-AL => 364: AL/US-AL/US-AL/Alabama
          Parent: USA
        BR-AL => 318: AL/BR-AL/BR-AL/Alagoas
          Parent: BRA
        RU-AL => 482: AL/RU-AL/RU-AL/Altai Republic
          Parent: RUS
-	
+		 Search a territory by name.
+
+Search a territory by name containing "alabama" (case insensitive)
+
+	t_mapcode -S alabama
+    -> 364 => 364: AL/US-AL/US-AL/Alabama
+	     Parent: USA
+
 Encode a coordinate with a context and a precision, put information of the shortest mapcode.
-Information is the mapcode, the territory context of the mapcode, the full mapcode (territory
-and mapcode separated by a space and enclosed by quotes, except for international mapcodes) and territory number.
+Information is the territory context of the mapcode, then the mapcode, then the full mapcode (territory and mapcode separated by a space and enclosed by quotes, except for international mapcodes where there is no territory), and then the territory number.
 
     t_mapcode -c 52.376482500 4.908511796 NLD P2
     ->   52.376482500    4.908511796
