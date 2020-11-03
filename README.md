@@ -69,7 +69,9 @@ A territory is designated by a unique territory identifier of (a private) type  
 `Get_Territory` returns the territory identifier of a territory code. An
 optional context helps to interpret ambiguous (abbreviated) alphacodes of
 subdivisions, such as "AL". If the territory code is not known or if several
-subdivisions match the specification (no context provided) it raises the exception `Unknown_Territory`.
+subdivisions match the specification (no context provided) it raises the exception `Unknown_Territory`. 
+
+Note: The check for ambiguity is strict among subdivisions but does not apply to aliases. As a consequence, "TAM" corresponds to "MX-TAM" without error despite "RU-TAM is also an alias for "RU-TT". (Aliases are not ambiguous among them, but would it be the case then Get_Territory would return one of them without error).
 
 Attribute | Description
 --- | ---
@@ -429,6 +431,9 @@ Put alternative mapcodes for a mapcode (shortests).
        => AAA VHXGB.1J9J 'VHXGB.1J9J' 532
 
 # Version History
+
+### 1.1.4
+* Find non ambiguous subdivision before alias
 
 ### 1.1.4
 * Move apart the public characteristics of territories
