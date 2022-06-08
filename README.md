@@ -308,8 +308,8 @@ With a `Context` set, decode a short mapcode.
 ## Converting a Mapcode into a language
 
 The reference language is Roman, used by the operations above. The child package
-Mapcodes.Language provides two operations to support conversion of a Mapcode in
-a Wide_String, to or from the languages:
+Mapcodes.Language provides three operations to support conversion of a Mapcode
+in a Wide_String, to or from the languages:
 Roman, Greek, Cyrillic, Hebrew, Devanagari, Malayalam, Georgian, Katakana, Thai,
 Lao, Armenian, Bengali, Gurmukhi, Tibetan, Arabic, Korean, Burmese, Khmer,
 Sinhalese, Thaana, Chinese, Tifinagh, Tamil, Amharic, Telugu, Odia, Kannada and
@@ -372,10 +372,11 @@ Usage:
     -h                                             // This help
     -t <territory>                                 // Territory info
     -s <subdivision>                               // Same subdivisions
-	-S <name>                                      // Search territory
+    -S <name>                                      // Search territory
     -d <territory_mapcode>                         // Decode
     -c <lat> <lon> [ <options> ]                   // Encode
     -a <territory_mapcode> [ <options> ]           // Alternative mapcodes
+    -l <mapcode> [ <language> ]                    // Convert into a language
     <territory_mapcode> ::= <territory>:<mapcode> | [ <territory> ] <mapcode>
     <options>           ::= [ <territory> ] [ <selection> ] [ <precision> ]
     <selection>         ::= [ all | local | short] // Default short
