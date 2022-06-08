@@ -34,21 +34,24 @@ https://github.com/malaise/ada/tree/master/usr/mapcode
 The following files, in directory `src`, provide utilities and data for mapcode
 processing:
 
-    mapcode-utils.ads             - Root package of the utilities:
-    as_u.ads as_u.adb             - Unbounded strings
-    bits.ads bits.adb             - Bit operations
-    str_tools.ads str_tools.adb   - String utilities
-	ndata.ads                     - Private data table for mapcode support
+    mapcode-utils.ads                 - Root package of the utilities:
+    as_u.ads as_u.adb                 - Unbounded strings
+    bits.ads bits.adb                 - Bit operations
+    str_tools.ads and .adb            - String utilities
+    ndata.ads                         - Private data table for mapcode support
+    language_defs.ads                 - Private definition of language sets
+    language_utils.adb and .adb       - Private utilites for languages
 
 The following files provide the Ada interface for mapcodes:
 
-    mapcode.ads mapcode.adb       - Key operations for mapcode support
-	countries.ads                 - Nums, Codes and Names of territories
+    mapcode.ads mapcode.adb           - Key operations for mapcode support
+    countries.ads                     - Nums, Codes and Names of territories
+    mapcodes-languages.ads and .adb   - Key operations for language conversion
     
 
 The following file contains the main procedure for testing the interfaces:
 
-    t_mapcode.adb                   - Command line tool to test Ada mapcodes
+    t_mapcode.adb                     - Command line tool to test Ada mapcodes
 
 
 In directory `test`, the command `fulltest` launches a complete test of the
@@ -302,6 +305,57 @@ With a `Context` set, decode a short mapcode.
     Decode ("49.4V", "NLD")
     -> (52.376514000001, 4.908543375000)
 
+## Converting a Mapcode into a language
+
+The reference language is Roman, used by the operations above. The child package
+Mapcodes.Language provides two operations to support conversion of a Mapcode in
+a Wide_String, to or from the languages:
+Roman, Greek, Cyrillic, Hebrew, Devanagari, Malayalam, Georgian, Katakana, Thai,
+Lao, Armenian, Bengali, Gurmukhi, Tibetan, Arabic, Korean, Burmese, Khmer,
+Sinhalese, Thaana, Chinese, Tifinagh, Tamil, Amharic, Telugu, Odia, Kannada and
+Gujarati.
+
+`Get_Language` identifies a language name expressed in its own language as a
+unicode sequence.
+
+attribute | description
+--- | ---
+`Name` | Unicode_Sequence of a language name
+return value | the language 
+exceptions | `Unknown_Language`, if the `Name` does not denote a supported language
+
+
+`Get_Language` detects the language, checks that all the characters are compatibl
+and returns the language of the Input.
+
+attribute | description 
+--- | --- 
+`Input` | Wide_String of a mapcode
+return value | the language used to encode the Input
+exceptions | `Invalid_Text`, if the `Input` is not correct
+
+Example:
+
+  Get_Language ("VHXGB.1J9J-RD") 
+  -> Roman
+
+
+`Convert` detects the language of the Input and converts it into the requested
+anguage.
+
+attribute | description
+--- | ---
+`Input` | Wide_String of a mapcode
+`Output_Language` | One of the supported languages
+return value | The `Input` converted into the `Output_Language`
+exceptions | `Invalid_Text`, if the `Input` is not correct
+
+Example:
+
+  Convert ("89.EU", Greek)
+  -> "Α9.Ω3"
+
+
 # Using the testing program
 
 The command line testing tool `t_mapcode` can perform mainly three actions:
@@ -329,6 +383,8 @@ Usage:
                         // all: all the mapcodes of all territories
                         // local: the shortest among all the mapcodes
     <precision>         ::= P0 to P8               // Default P0
+    <language>          ::= language name (any casing) or num (0 for Roman)
+                        // Input language is guessed, default output is Romaic
 
 
 Default selection leads to encode with Shortest => True, while `all` leads to
@@ -352,14 +408,16 @@ Put information on a territory (providing ISO code or number). The information c
 
 List all subdivisions named "xx-AL".
 
-	t_mapcode -s AL
-	-> US-AL => 364: AL/US-AL/US-AL/Alabama
+    t_mapcode -s AL
+    -> US-AL => 364: AL/US-AL/US-AL/Alabama
          Parent: USA
        BR-AL => 318: AL/BR-AL/BR-AL/Alagoas
          Parent: BRA
        RU-AL => 482: AL/RU-AL/RU-AL/Altai Republic
          Parent: RUS
-		 Search a territory by name.
+
+
+Search a territory by name.
 
 Search a territory by name containing "alabama" (case insensitive)
 
@@ -430,7 +488,18 @@ Put alternative mapcodes for a mapcode (shortests).
        => NLD 49.4V 'NLD 49.4V' 112
        => AAA VHXGB.1J9J 'VHXGB.1J9J' 532
 
+Convert a mapcode into Greek
+    t_mapcode -l VHXGB.1J9J 1
+    -> ΦΗ9ΓΒ.21Π39
+
+Convert a mapcode into Roman
+    t_mapcode -l ΦΗ9ΓΒ.21Π39 Roman
+    -> VHXGB.1J9J
+
 # Version History
+
+### 1.1.5
+* Add language support
 
 ### 1.1.4
 * Find non ambiguous subdivision before alias

@@ -39,6 +39,9 @@ export PRECISION=2
 export SCENARIO_ONLY=0
 export TEST=0
 
+# Elapsed time
+T0=`date "+%s"`
+
 # DEBUG mode logs each operation
 # PRECISION is 0, 1 or 2
 # SCENARIO_ONLY play only the scenario
@@ -48,8 +51,8 @@ function usage {
   echo "Usage: `basename $0` [ -p <prec> | --precision=<prec> ] [ -d | --debug ] [ -s | --scenario_only ] [ -t | --test ]"
   echo "    or `basename $0` [ -h | --help ]"
   echo " Precision is from 0 to 8, default: $PRECISION"
-  echo " Debug logs each incdividual test"
-  echo " Scenario_only play only the scenario"
+  echo " Debug logs each individual test"
+  echo " Scenario_only plays only the scenario"
   echo " Test mode plays the scenario, tests the encoding_ok and 1% of the decoding_ok"
 }
 
@@ -214,6 +217,71 @@ echo OK.
 if [ "$SCENARIO_ONLY" = "1" ] ; then
   exit 0
 fi
+
+# Languages
+echo Languages
+if [ $TEST -eq 1 ] ; then
+  # Some lines in test mode, here are the Numbers of effective lines
+  export TESTS=(1 174 298 478 561 4788)
+  let I=0
+else
+  # All the tests
+  let I=1
+fi
+PrevLang=x
+while true ; do
+  if [ $TEST -eq 1 ] ; then
+    # Some speicif effective lines
+    if [ -z "${TESTS[$I]}" ] ; then
+      break
+    fi
+    let L=${TESTS[$I]}
+  else
+    # All the lines
+    let L=$I
+  fi
+  # En of file
+  Lang=`readarg $TDIR/Alphabets $L 1`
+  if [ -z "$Lang" ] ; then
+    break;
+  fi
+  Input=`readarg $TDIR/Alphabets $L 2`
+  Output=`readarg $TDIR/Alphabets $L 3`
+  Back=`readarg $TDIR/Alphabets $L 4`
+  if [ -n "$DEBUG" ] ; then
+    echo -l "$Input" "$Lang"
+  elif [ "$Lang" != "$PrevLang" ] ; then
+    echo -n $Lang " " 
+  fi
+  PrevLang=$Lang
+  # From Input in Roman to Output in Lang
+  Got_Output=`t_mapcode -l $Input $Lang`
+  export code=$?
+  if [ $code -ne 0 ] ; then
+    error "mapcode has exited with code $code"
+    exit 1
+  fi
+  res=`check "-t" "$Got_Output" "$Output" 0`
+  if [ "$res" != "0" ] ; then
+    error "$Input $Lang => $Got_Output instead of $Output"
+  fi
+  # From Output back into Input
+  Got_Back=`t_mapcode -l $Output`
+  export code=$?
+  if [ $code -ne 0 ] ; then
+    error "mapcode has exited with code $code"
+    exit 1
+  fi
+  res=`check "-t" "$Got_Back" "$Back" 0`
+  if [ "$res" != "0" ] ; then
+    error "$Output => $Got_Back instead of $Back"
+  fi
+  let I=$I+1
+done
+if [ -z "$DEBUG" ] ; then
+  echo
+fi
+echo OK
 
 if [ $TEST -eq 0 ] ; then
   # Check Territory failures
@@ -417,5 +485,14 @@ while read -r ctx cod lat lon loc glo || [[ -n "$ctx" ]]; do
   let L=$L+1
 done < $TDIR/DecodeOk
 echo
-echo OK.
+if [ $TEST -eq 0 ] ; then
+  T1=`date "+%s"`
+  echo $T0 $T1 | awk '
+    {D=$2-$1
+     printf "Done in %dmn%ds\n", D/60, D%60
+    }
+  '
+else
+  echo OK.
+fi
 
