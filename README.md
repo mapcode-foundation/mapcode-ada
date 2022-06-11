@@ -325,7 +325,7 @@ return value | the language
 exceptions | `Unknown_Language`, if the `Name` does not denote a supported language
 
 
-`Get_Language` detects the language, checks that all the characters are compatibl
+`Get_Language` detects the language, checks that all the characters are compatible
 and returns the language of the Input.
 
 attribute | description 
@@ -336,12 +336,12 @@ exceptions | `Invalid_Text`, if the `Input` is not correct
 
 Example:
 
-  Get_Language ("VHXGB.1J9J-RD") 
-  -> Roman
+    Get_Language ("VHXGB.1J9J-RD") 
+    -> Roman
 
 
 `Convert` detects the language of the Input and converts it into the requested
-anguage.
+language.
 
 attribute | description
 --- | ---
@@ -352,8 +352,8 @@ exceptions | `Invalid_Text`, if the `Input` is not correct
 
 Example:
 
-  Convert ("89.EU", Greek)
-  -> "Α9.Ω3"
+    Convert ("89.EU", Greek)
+    -> "Α9.Ω3"
 
 
 # Using the testing program
@@ -490,10 +490,12 @@ Put alternative mapcodes for a mapcode (shortests).
        => AAA VHXGB.1J9J 'VHXGB.1J9J' 532
 
 Convert a mapcode into Greek
+
     t_mapcode -l VHXGB.1J9J 1
     -> ΦΗ9ΓΒ.21Π39
 
 Convert a mapcode into Roman
+
     t_mapcode -l ΦΗ9ΓΒ.21Π39 Roman
     -> VHXGB.1J9J
 
