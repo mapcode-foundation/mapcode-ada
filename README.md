@@ -315,8 +315,8 @@ Lao, Armenian, Bengali, Gurmukhi, Tibetan, Arabic, Korean, Burmese, Khmer,
 Sinhalese, Thaana, Chinese, Tifinagh, Tamil, Amharic, Telugu, Odia, Kannada and
 Gujarati.
 
-`Get_Language` identifies a language name expressed in its own language as a
-unicode sequence.
+`Get_Language` identifies a language name expressed (as a unicode sequence)
+either in Roman or in its own language.
 
 attribute | description
 --- | ---
