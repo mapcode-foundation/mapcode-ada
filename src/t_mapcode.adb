@@ -335,7 +335,7 @@ begin
       -- Text is in ENV (easier with a debugger)
       --  and output language will be default
         begin
-          Arg1 := As_U.Tus (Ada.Environment_Variables ("Mapcode");
+          Arg1 := As_U.Tus (Ada.Environment_Variables.Value ("Mapcode"));
         exception
           when others =>
             Arg1.Set_Null;
