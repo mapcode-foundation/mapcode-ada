@@ -366,27 +366,24 @@ The command line testing tool `t_mapcode` can perform mainly three actions:
 
 * Encode a coordinate into mapcodes, according to options
 
-Usage:
-
-    t_mapcode <command>
-    -h                                             // This help
-    -t <territory>                                 // Territory info
-    -s <subdivision>                               // Same subdivisions
-    -S <name>                                      // Search territory
-    -d <territory_mapcode>                         // Decode
-    -c <lat> <lon> [ <options> ]                   // Encode
-    -a <territory_mapcode> [ <options> ]           // Alternative mapcodes
-    -l <mapcode> [ <language> ]                    // Convert into a language
-    <territory_mapcode> ::= <territory>:<mapcode> | [ <territory> ] <mapcode>
-    <options>           ::= [ <territory> ] [ <selection> ] [ <precision> ]
-    <selection>         ::= [ all | local | short] // Default short
-                        // Default: one mapcode (the shortest) of each territory
-                        // all: all the mapcodes of all territories
-                        // local: the shortest among all the mapcodes
-    <precision>         ::= P0 to P8               // Default P0
-    <language>          ::= language name (any casing) or num (0 for Roman)
-                        // Input language is guessed, default output is Romaic
-
+Usage: ./t_mapcode <command>
+  -h                                       // This help
+  -t <territory> [ <context> ]             // Territory info
+  -s <subdivision>                         // Same subdivisions
+  -S <name>                                // Search territory
+  -d  <territory_mapcode>                  // Decode
+  -c <lat> <lon> [ <options> ]             // Encode
+  -a  <territory_mapcode> [ <options> ]    // Alternative mapcodes
+  -l  [ <mapcode> [ <language> ] ]         // List or convert into a language
+  <territory_mapcode> ::= <territory>:<mapcode> | [ <territory> ] <mapcode>
+  <options>           ::= [ <territory> ] [ <selection> ] [ <precision> ]
+  <selection>         ::= [ all | local | short] // Default short
+                      // short: one mapcode (the shortest) of each territory
+                      // all: all the mapcodes of all territories
+                      // local: the shortest among all the mapcodes
+  <precision>         ::= P0 .. P8               // Default P0 or from input
+  <language>          ::= language name (any casing) or num (0 for Roman)
+                      // Input language is guessed, default output is Romaic
 
 Default selection leads to encode with Shortest => True, while `all` leads to
 encode with Shortest => False, and 'local' leads to encode with Shortest => True
@@ -498,6 +495,14 @@ Convert a mapcode into Roman
 
     t_mapcode -l ΦΗ9ΓΒ.21Π39 Roman
     -> VHXGB.1J9J
+
+List all languages
+
+    t_mapcode -l
+    -> 00 Roman
+       01 Greek
+     ...
+       27 Gujarati
 
 # Version History
 
